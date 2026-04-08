@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16
+    container_name: vibedb-container
+    environment:
+      POSTGRES_USER: kamivision
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: vibe_db
+    ports:
+      - "5433:5432"
+    # volumes:
+    #   - vibe_postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./server
+    container_name: vibeserver-container
+    # env_file:
+    #   - .env
+    command: sh -c "python manage.py migrate && gunicorn vibe_server.wsgi --bind 0.0.0:8000 --reload"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server:/app
+    depends_on:
+      - db
