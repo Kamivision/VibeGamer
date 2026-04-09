@@ -25,8 +25,9 @@ SECRET_KEY = 'django-insecure-sqls+%_rb2j%tt85@dlf^6)i9@tw*cgqj=^qpfnlc!aba^h%+q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '0.0.0.0']
 
+AUTH_USER_MODEL = 'user_app.User'
 
 # Application definition
 
@@ -37,6 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'user_app',
+    'quiz_app',
+    'game_app',
+    'profile_app',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'vibe_server.urls'
@@ -74,8 +82,12 @@ WSGI_APPLICATION = 'vibe_server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'vibe_db',
+        "HOST": "vibedb-container",
+        "USER": "kamivision",
+        "PASSWORD": "password",      
+        "PORT":'5432'
     }
 }
 
