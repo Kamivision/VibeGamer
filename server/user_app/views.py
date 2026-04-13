@@ -23,7 +23,7 @@ class CreateUserView(APIView):
             new_user.full_clean()
             new_user.save()
             token = Token.objects.create(user=new_user)
-            return Response({"token":token.key, "email":new_user.email}, status=s.HTTP_201_CREATED)
+            return Response({"token":token.key, "email":new_user.email, "username":new_user.username}, status=s.HTTP_201_CREATED)
         except Exception as e:
             return Response(e.args, status=s.HTTP_400_BAD_REQUEST)
     
@@ -37,7 +37,7 @@ class LoginView(APIView):
         user = authenticate(username=data.get('username'), password=data.get("password"))
         if user:
             token, _ = Token.objects.get_or_create(user=user)
-            return Response({"token":token.key, "email":user.email})
+            return Response({"token":token.key, "email":user.email, "username":user.username})
         else:
             return Response("No user matching credentials", status=s.HTTP_404_NOT_FOUND)
 

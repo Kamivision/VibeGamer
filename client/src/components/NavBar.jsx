@@ -7,6 +7,10 @@ import {
   IconButton,
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import {Link, useNavigate} from "react-router-dom";
+import { handleSignOut } from "../utilities";
+
+
 
 function NavItem({ label }) {
   return (
@@ -29,34 +33,63 @@ function NavList() {
   );
 }
 
-export default function NavBar() {
+export default function NavBar({ user, setUser }) {
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen((cur) => !cur);
+  const navigate = useNavigate();
+
+  function handleOpen() {
+    setOpen((current) => !current);
+  }
+
+  async function onSignOutClick() {
+    await handleSignOut();
+    setUser(null);
+    navigate("/");
+  }
 
   React.useEffect(() => {
-    window.addEventListener(
-      "resize",
-      () => window.innerWidth >= 960 && setOpen(false)
-    );
+    function onResize() {
+      if (window.innerWidth >= 960) {
+        setOpen(false);
+      }
+    }
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   return (
     <Navbar className="bg-cyan-400" fullWidth>
       <div className="container mx-auto flex items-center justify-between text-blue-gray-900">
-        <Typography
-          as="a"
-          href="#"
-          color="blue-gray"
-          className="mr-4 cursor-pointer text-lg font-bold"
-        >
-          Vibe Gamer
-        </Typography>
+        <Link to="/">
+          <Typography
+            as="span"
+            color="blue-gray"
+            className="mr-4 cursor-pointer text-lg font-bold"
+          >
+            Vibe Gamer
+          </Typography>
+        </Link>
+
         <div className="hidden lg:block">
           <NavList />
         </div>
-        <Button color="gray" className="hidden lg:inline-block">
-          Sign in
-        </Button>
+
+        {user ? (
+          <div className="hidden items-center gap-3 lg:flex">
+            <span className="text-sm">{user.username}</span>
+            <Button color="gray" onClick={onSignOutClick}>
+              Sign out
+            </Button>
+          </div>
+        ) : (
+          <Link to="/auth">
+            <Button color="gray" className="hidden lg:inline-block">
+              Sign in
+            </Button>
+          </Link>
+        )}
+
         <IconButton
           size="sm"
           variant="text"
@@ -71,18 +104,26 @@ export default function NavBar() {
           )}
         </IconButton>
       </div>
+
       <Collapse open={open}>
         <div className="mt-2 rounded-xl bg-white py-2">
           <NavList />
-          <Button className="mb-2" fullWidth>
-            Sign in
-          </Button>
+
+          {user ? (
+            <Button className="mb-2" fullWidth onClick={onSignOutClick}>
+              Sign out
+            </Button>
+          ) : (
+            <Link to="/auth">
+              <Button className="mb-2" fullWidth>
+                Sign in
+              </Button>
+            </Link>
+          )}
         </div>
       </Collapse>
     </Navbar>
   );
 }
-
-
 
 
