@@ -27,7 +27,9 @@ function NavList() {
     <ul className="mb-4 mt-2 flex flex-col gap-3 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-8">
       <NavItem label="Genres" />
       <NavItem label="New Releases" />
-      <NavItem label="Your Library" />
+      <Link to="/library">
+        <NavItem label="Your Library" />
+      </Link>
       <NavItem label="Vibe Quiz" />
     </ul>
   );

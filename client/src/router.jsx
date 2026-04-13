@@ -3,6 +3,7 @@ import App from "./App";
 import HomePage from "./pages/HomePage";
 import { userVerify } from "./utilities";
 import AuthPage from "./pages/AuthPage";
+import UserLibrary from "./pages/UserLibrary";
 
 
 const router = createBrowserRouter([
@@ -19,6 +20,11 @@ const router = createBrowserRouter([
                 path: "auth",
                 element: <AuthPage />
             },
+            {
+                path: "library",
+                element: <UserLibrary />
+            },
+
         ]
     },
 ]);

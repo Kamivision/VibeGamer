@@ -49,7 +49,7 @@ class UserView(APIView):
 class InfoView(UserView):
     def get(self, request):
         user = request.user
-        return Response({"token":user.auth_token.key, "email":user.email})
+        return Response({"token":user.auth_token.key, "email":user.email, "username":user.username})
 
 class LogOutView(UserView):
     def post(self, request):
