@@ -13,7 +13,7 @@ class ProfileView(UserView):
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
-    def post(self, request):
+    def put(self, request):
         profile = get_object_or_404(Profile, user=request.user)
         serializer = ProfileSerializer(profile, data=request.data, partial=True)
         if serializer.is_valid():
