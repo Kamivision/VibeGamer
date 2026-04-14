@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
+from profile_app.models import Profile
 
 # Create your views here.
 class CreateUserView(APIView):
@@ -19,10 +21,14 @@ class CreateUserView(APIView):
         password = request.data.get('password')
 
         try:
-            new_user = User.objects.create_user(email=email, username=username, password=password)
-            new_user.full_clean()
-            new_user.save()
-            token = Token.objects.create(user=new_user)
+            with transaction.atomic():
+                new_user = User.objects.create_user(email=email, username=username, password=password)
+                new_user.full_clean()
+                new_user.save()
+
+                token = Token.objects.create(user=new_user)
+                Profile.objects.create(user=new_user)
+
             return Response({"token":token.key, "email":new_user.email, "username":new_user.username}, status=s.HTTP_201_CREATED)
         except Exception as e:
             return Response(e.args, status=s.HTTP_400_BAD_REQUEST)
