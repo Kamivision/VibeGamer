@@ -4,6 +4,8 @@ import HomePage from "./pages/HomePage";
 import { userVerify } from "./utilities";
 import AuthPage from "./pages/AuthPage";
 import UserLibrary from "./pages/UserLibrary";
+import QuizPage from "./pages/QuizPage";
+import UserProfile from "./pages/UserProfile";
 
 
 const router = createBrowserRouter([
@@ -24,6 +26,14 @@ const router = createBrowserRouter([
                 path: "library",
                 element: <UserLibrary />
             },
+            {
+                path: "quiz",
+                element: <QuizPage />
+            },
+            {
+                path: "profile",
+                element: <UserProfile />
+            }
 
         ]
     },

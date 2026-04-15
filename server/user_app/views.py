@@ -11,6 +11,7 @@ from django.db import transaction
 from profile_app.models import Profile
 
 # Create your views here.
+
 class CreateUserView(APIView):
     authentication_classes = []
     permission_classes = []

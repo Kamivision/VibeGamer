@@ -1,8 +1,14 @@
 import axios from "axios";
 
+const tokenKey = "token";
+
 export const api = axios.create({
   baseURL: "/api/v1/",
 });
+
+function getStoredToken() {
+  return localStorage.getItem(tokenKey);
+}
 
 function setAuthHeader(token) {
   api.defaults.headers.common.Authorization = `Token ${token}`;
@@ -12,6 +18,21 @@ function clearAuthHeader() {
   delete api.defaults.headers.common.Authorization;
 }
 
+function keepSession(token) {
+  localStorage.setItem(tokenKey, token);
+  setAuthHeader(token);
+}
+
+function clearSession() {
+  localStorage.removeItem(tokenKey);
+  clearAuthHeader();
+}
+
+function createAuthenticatedUser(data) {
+  keepSession(data.token);
+  return normalizeUser(data);
+}
+
 function normalizeUser(data) {
   return {
     email: data.email,
@@ -19,8 +40,18 @@ function normalizeUser(data) {
   };
 }
 
+async function authenticateUser(path, formData, successStatus) {
+  const response = await api.post(path, formData);
+
+  if (response.status === successStatus) {
+    return createAuthenticatedUser(response.data);
+  }
+
+  return null;
+}
+
 export async function userVerify() {
-  const token = localStorage.getItem("token");
+  const token = getStoredToken();
 
   if (!token) {
     clearAuthHeader();
@@ -32,42 +63,19 @@ export async function userVerify() {
   try {
     const response = await api.get("users/");
 
-    if (response.status === 200) {
-      return normalizeUser(response.data);
-    }
-
-    return null;
+    return response.status === 200 ? normalizeUser(response.data) : null;
   } catch (error) {
-    localStorage.removeItem("token");
-    clearAuthHeader();
+    clearSession();
     return null;
   }
 }
 
 export async function handleSignIn(formData) {
-  const response = await api.post("users/login/", formData);
-
-  if (response.status === 200) {
-    const token = response.data.token;
-    localStorage.setItem("token", token);
-    setAuthHeader(token);
-    return normalizeUser(response.data);
-  }
-
-  return null;
+  return authenticateUser("users/login/", formData, 200);
 }
 
 export async function handleSignUp(formData) {
-  const response = await api.post("users/create/", formData);
-
-  if (response.status === 201) {
-    const token = response.data.token;
-    localStorage.setItem("token", token);
-    setAuthHeader(token);
-    return normalizeUser(response.data);
-  }
-
-  return null;
+  return authenticateUser("users/register/", formData, 201);
 }
 
 export async function handleSignOut() {
@@ -76,7 +84,6 @@ export async function handleSignOut() {
   } catch (error) {
     // Ignore logout request failures and still clear local session.
   } finally {
-    localStorage.removeItem("token");
-    clearAuthHeader();
+    clearSession();
   }
 }

@@ -30,7 +30,9 @@ function NavList() {
       <Link to="/library">
         <NavItem label="Your Library" />
       </Link>
-      <NavItem label="Vibe Quiz" />
+      <Link to="/quiz">
+        <NavItem label="Vibe Quiz" />
+      </Link>
     </ul>
   );
 }
@@ -69,7 +71,7 @@ export default function NavBar({ user, setUser }) {
             color="blue-gray"
             className="mr-4 cursor-pointer text-lg font-bold"
           >
-            Vibe Gamer
+            VibeGamer
           </Typography>
         </Link>
 
@@ -79,7 +81,9 @@ export default function NavBar({ user, setUser }) {
 
         {user ? (
           <div className="hidden items-center gap-3 lg:flex">
-            <span className="text-sm">{user.username}</span>
+            <Link to="/profile">
+              <span className="text-sm">{user.username}</span>
+            </Link>
             <Button color="gray" onClick={onSignOutClick}>
               Sign out
             </Button>
