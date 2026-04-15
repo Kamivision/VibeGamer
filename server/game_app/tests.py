@@ -29,7 +29,7 @@ class SavedGameTests(APITestCase):
         )
 
         self.saved_list_url = "/api/v1/games/saved/"
-        self.save_url = f"/api/v1/games/save/{self.game.id}/"
+        self.save_url = f"/api/v1/games/save/{self.game.id}/" # type: ignore
 
     def authenticate(self):
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
@@ -46,8 +46,8 @@ class SavedGameTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["user"], self.user.id)
-        self.assertEqual(response.data[0]["game"], self.game.id)
+        self.assertEqual(response.data[0]["user"], self.user.id) # type: ignore
+        self.assertEqual(response.data[0]["game"], self.game.id) # type: ignore
 
     def test_post_save_creates_saved_game(self):
         self.authenticate()

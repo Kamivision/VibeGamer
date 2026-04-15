@@ -37,7 +37,7 @@ class ProfileViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["personality"], "Chill Explorer")
         self.assertEqual(response.data["play_time_preference"], "medium")
-        self.assertEqual(response.data["user"], self.user.id)
+        self.assertEqual(response.data["user"], self.user.id) # type: ignore
 
     def test_put_profile_updates_current_users_profile(self):
         self.authenticate()

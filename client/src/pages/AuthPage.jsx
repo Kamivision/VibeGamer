@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import SignInForm from "../components/SignInForm";
-import SignUpForm from "../components/SignUpForm";
+import AuthForm from "../components/AuthForm";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,11 +18,10 @@ export default function AuthPage() {
 
   return (
     <div className="mx-auto max-w-md py-8">
-      {isSignUp ? (
-        <SignUpForm onSignUp={handleAuthSuccess} />
-      ) : (
-        <SignInForm onSignIn={handleAuthSuccess} />
-      )}
+      <AuthForm 
+      mode={isSignUp ? "signup" : "signin"} 
+      onAuthSuccess={handleAuthSuccess} 
+      />
 
       <button type="button" onClick={toggleForm} className="mt-4 text-sm underline">
         {isSignUp
