@@ -14,8 +14,8 @@ services:
   backend:
     build: ./server
     container_name: vibeserver-container
-    # env_file:
-    #   - .env
+    env_file:
+      - .env
     # command: sh -c "gunicorn vibe_server.wsgi --bind 0.0.0:8000 --reload"
     command: sh -c "python manage.py migrate && gunicorn vibe_server.wsgi --bind 0.0.0:8000 --reload"
     ports:

@@ -6,6 +6,7 @@ import AuthPage from "./pages/AuthPage";
 import UserLibrary from "./pages/UserLibrary";
 import QuizPage from "./pages/QuizPage";
 import UserProfile from "./pages/UserProfile";
+import NewRelease from "./pages/NewRelease";
 
 
 const router = createBrowserRouter([
@@ -33,7 +34,12 @@ const router = createBrowserRouter([
             {
                 path: "profile",
                 element: <UserProfile />
+            },
+            {
+                path: "new",
+                element: <NewRelease />
             }
+
 
         ]
     },

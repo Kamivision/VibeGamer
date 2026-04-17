@@ -94,4 +94,23 @@ export async function saveQuizResult({ personality, quizResults}) {
   });
   return response.data;
 } 
+
+export async function fetchNewReleases(page = 1) {
+  const today = new Date();
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+
+  const toDate = today.toISOString().split("T")[0];
+  const fromDate = thirtyDaysAgo.toISOString().split("T")[0];
+
+  const response = await api.get("games/rawg/", {
+    params: {
+      ordering: "-released",
+      dates: `${fromDate},${toDate}`,
+      page,
+      page_size: 12,
+    },
+  });
+  return response.data;
+}
      

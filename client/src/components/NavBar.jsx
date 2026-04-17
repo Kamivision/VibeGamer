@@ -29,7 +29,9 @@ function NavList() {
         <NavItem label="Home" />
       </Link>
       <NavItem label="Genres" />
-      <NavItem label="New Releases" />
+      <Link to="/new">
+        <NavItem label="New Releases" />
+      </Link>
       <Link to="/library">
         <NavItem label="Your Library" />
       </Link>
