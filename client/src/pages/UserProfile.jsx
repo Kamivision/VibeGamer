@@ -1,7 +1,6 @@
 import React from "react";
 import { Navigate, useOutletContext } from "react-router-dom";
 import {
-  Button,
   Card, CardBody, CardHeader,
   Tabs, TabsHeader, TabsBody, Tab, TabPanel,
   Typography,
@@ -12,23 +11,21 @@ import {
   UserCircleIcon,
   Cog6ToothIcon,
 } from "@heroicons/react/24/solid";
+import logoImage from "../assets/logo.jpg";
 
 export default function UserProfile() {
   const data = [
       {
-        label: "Dashboard",
-        value: "dashboard",
+        label: "Saved Games",
+        value: "saved-games",
         icon: Square3Stack3DIcon,
-        desc: `It really matters and then like it really doesn't matter.
-        What matters is the people who are sparked by it. And the people
-        who are like offended by it, it doesn't matter.`,
+        desc: `List of saved games will go here. This is where you can view and manage your saved game sessions, including details like game name, date saved, and any notes you may have added.`,
       },
       {
-        label: "Profile",
-        value: "profile",
+        label: "Vibes",
+        value: "vibes",
         icon: UserCircleIcon,
-        desc: `Because it's about motivating the doers. Because I'm here
-        to follow my dreams and inspire other people to follow their dreams, too.`,
+        desc: `Vibe quiz result and vibe history will go here. This section will display your vibe quiz results, showing your current gaming vibe and a history of your past vibes to track how your gaming preferences have evolved over time.`,
       },
       {
         label: "Settings",
@@ -40,7 +37,7 @@ export default function UserProfile() {
             <select className="block w-full p-2 border border-gray-300 rounded-md">
               <option value="short"> Short and Sweet - 1 hour or less</option>
               <option value="medium"> I've got some time - up to 2 hours</option>
-              <option value="long"> True gamer session - up to 4</option>
+              <option value="long"> True gamer session - up to 4 hours</option>
               <option value="xlong"> All the time in the world - 4 hours or more</option>
             </select>
           </div>,
@@ -59,14 +56,12 @@ export default function UserProfile() {
         shadow={false}
         className="border border-gray-300 rounded-2xl"
       >
-        <CardHeader shadow={false} className="h-60 !rounded-lg">
-          {/* <Image
-            src="/image/dark-image.png"
+        <CardHeader shadow={false} className="h-80 !rounded-lg">
+          <img
+            src={logoImage}
             alt="dark"
-            height={1024}
-            width={1024}
-            className="w-full h-full object-center"
-          /> */}
+            className="h-full w-full object-contain object-center"
+          />
         </CardHeader>
         <CardBody>
           <div className="flex flex-wrap items-center justify-between gap-6 lg:gap-0">
@@ -88,7 +83,7 @@ export default function UserProfile() {
                 </Typography>
               </div>
             </div>
-          <Tabs value="dashboard">
+          <Tabs value="saved-games">
                 <TabsHeader>
                   {data.map(({ label, value, icon }) => (
                     <Tab key={value} value={value}>

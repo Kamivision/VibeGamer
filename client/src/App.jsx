@@ -7,7 +7,7 @@ export default function App() {
   const [user, setUser] = useState(initialUser);
 
   return (
-    <div className="bg-[url('/src/assets/image.png')] bg-center bg-repeat">
+    <div className="bg-[url('/src/assets/background.png')] bg-center bg-repeat">
       <NavBar user={user} setUser={setUser} />
       <main className="mx-auto mt-8 w-full max-w-6xl rounded-lg bg-white px-4 shadow-lg">
         <Outlet context={{ user, setUser }} />
