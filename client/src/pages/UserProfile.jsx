@@ -2,48 +2,12 @@ import React from "react";
 import { Navigate, useOutletContext } from "react-router-dom";
 import {
   Card, CardBody, CardHeader,
-  Tabs, TabsHeader, TabsBody, Tab, TabPanel,
   Typography,
 } from "@material-tailwind/react";
 import { UserCircleIcon as DefaultAvatar } from "@heroicons/react/24/outline";
-import {
-  Square3Stack3DIcon,
-  UserCircleIcon,
-  Cog6ToothIcon,
-} from "@heroicons/react/24/solid";
 import logoImage from "../assets/logo.jpg";
 
 export default function UserProfile() {
-  const data = [
-      {
-        label: "Saved Games",
-        value: "saved-games",
-        icon: Square3Stack3DIcon,
-        desc: `List of saved games will go here. This is where you can view and manage your saved game sessions, including details like game name, date saved, and any notes you may have added.`,
-      },
-      {
-        label: "Vibes",
-        value: "vibes",
-        icon: UserCircleIcon,
-        desc: `Vibe quiz result and vibe history will go here. This section will display your vibe quiz results, showing your current gaming vibe and a history of your past vibes to track how your gaming preferences have evolved over time.`,
-      },
-      {
-        label: "Settings",
-        value: "settings",
-        icon: Cog6ToothIcon,
-        desc: 
-          <div className="flex flex-col gap-4 w-full">
-            <label className="block mb-2 text-sm font-medium text-gray-700">Time Preference</label>
-            <select className="block w-full p-2 border border-gray-300 rounded-md">
-              <option value="short"> Short and Sweet - 1 hour or less</option>
-              <option value="medium"> I've got some time - up to 2 hours</option>
-              <option value="long"> True gamer session - up to 4 hours</option>
-              <option value="xlong"> All the time in the world - 4 hours or more</option>
-            </select>
-          </div>,
-      },
-    ];
-
   const { user } = useOutletContext();
 
   if (!user) {
@@ -54,16 +18,20 @@ export default function UserProfile() {
     <section className="container mx-auto px-8 py-10">
       <Card
         shadow={false}
-        className="border border-gray-300 rounded-2xl"
+        className="border border-gray-300 rounded-2xl bg-violet-500"
       >
-        <CardHeader shadow={false} className="h-80 !rounded-lg">
+        <h1 className="flex items-center justify-center text-4xl font-bold text-yellow-300 text-shadow-lg">
+            {user.username}'s Profile
+        </h1>
+        <CardHeader shadow={false} className="mt-5 h-70 rounded-lg">
+          
           <img
             src={logoImage}
             alt="dark"
-            className="h-full w-full object-contain object-center"
+            className="h-full w-full object-cover object-center"
           />
         </CardHeader>
-        <CardBody>
+        <CardBody className = "bg-white">
           <div className="flex flex-wrap items-center justify-between gap-6 lg:gap-0">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 text-gray-600">
@@ -82,27 +50,59 @@ export default function UserProfile() {
                   {user.email}
                 </Typography>
               </div>
+              <button className="ml-4 rounded-lg bg-violet-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 justify-self-right">
+                View Library
+              </button>
+              <button className="ml-4 rounded-lg bg-violet-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 justify-self-right">
+                Edit Story
+              </button>
+              <button className="ml-4 rounded-lg bg-violet-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 justify-self-right">
+                View Recommendations
+              </button>
             </div>
-          <Tabs value="saved-games">
-                <TabsHeader>
-                  {data.map(({ label, value, icon }) => (
-                    <Tab key={value} value={value}>
-                      <div className="flex items-center gap-2">
-                        {React.createElement(icon, { className: "w-5 h-5" })}
-                        {label}
-                      </div>
-                    </Tab>
-                  ))}
-                </TabsHeader>
-                <TabsBody>
-                  {data.map(({ value, desc }) => (
-                    <TabPanel key={value} value={value}>
-                      {desc}
-                    </TabPanel>
-                  ))}
-                </TabsBody>
-          </Tabs>
-            </div>
+          </div>
+          <div className="mt-8">
+            <Typography variant="h5" className="mb-4 text-left">
+              Gamer Story:
+            </Typography>
+            <Typography variant="body1" className="text-gray-700 text-left">
+              This is a placeholder for the user's bio or additional information.
+              You can customize this section to include more details about the user.
+            </Typography>
+          </div>
+        </CardBody>
+      </Card>
+      <Card>
+        <CardBody>
+          <Typography variant="h5" className="mb-4 text-left">
+            Your Vibes:
+          </Typography>
+          <Typography variant="body1" className="text-gray-700 text-left">
+            This is a placeholder for the user's quiz answers. You can customize
+            this section to display relevant information.
+          </Typography>
+        </CardBody>
+      </Card>
+      <Card>
+        <CardBody>
+          <Typography variant="h5" className="mb-4 text-left">
+            Your Style:
+          </Typography>
+          <Typography variant="body1" className="text-gray-700 text-left">
+            This is a placeholder for the user's style preferences. You can customize
+            this section to display relevant information.
+          </Typography>
+        </CardBody>
+      </Card>
+      <Card>
+        <CardBody>
+          <Typography variant="h5" className="mb-4 text-left">
+            Recent Games:
+          </Typography>
+          <Typography variant="body1" className="text-gray-700 text-left">
+            This is a placeholder for the user's recent games. You can customize
+            this section to display relevant information.
+          </Typography>
         </CardBody>
       </Card>
     </section>
