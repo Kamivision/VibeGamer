@@ -87,3 +87,11 @@ export async function handleSignOut() {
     clearSession();
   }
 }
+
+export async function saveQuizResult({ personality, quizResults}) {
+  const response = await api.put("profile/", { 
+    personality, quiz_results: quizResults, 
+  });
+  return response.data;
+} 
+     

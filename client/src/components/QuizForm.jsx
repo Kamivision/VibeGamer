@@ -15,17 +15,17 @@ export default function QuizForm({ questions, current, answers, progress, select
       <p className={styles.question}>{q.q}</p>
 
       <div className={styles.options}>
-        {q.opts.map((o, i) => (
+        {q.opts.map((option, index) => (
           <button
-            key={i}
+            key={index}
             type="button"
-            className={`${styles.opt} ${styles.optHover} ${
-              answers[current] === i ? styles.optSelected : ""
+            className={`${styles.opt}  ${
+              answers[current] === index ? styles.optSelected : styles.optHover
             }`}
-            onClick={() => select(i)}
+            onClick={() => select(index)}
           >
-            <span className={styles.optIcon}>{o.icon}</span>
-            <span>{o.label}</span>
+            <span className={styles.optIcon}>{option.icon}</span>
+            <span>{option.label}</span>
           </button>
         ))}
       </div>
@@ -67,11 +67,11 @@ const styles = {
 
   options: "flex flex-col gap-[10px]",
 
-  opt: "flex w-full items-center gap-3 rounded-xl border border-black/10 bg-white px-4 py-[13px] text-left text-sm text-black",
+  opt: "flex w-full items-center gap-3 rounded-xl border border-black/10 bg-white px-4 py-[13px] text-left text-sm text-black ",
 
   optHover: "hover:border-black/20 hover:bg-zinc-50",
 
-  optSelected: "border-black bg-violet-400 text-violet-900",
+  optSelected: "border-violet-500 shadow-lg text-violet-900",
 
   optIcon: "flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-lg bg-[#f0efe9] text-base",
 

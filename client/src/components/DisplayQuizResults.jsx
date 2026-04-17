@@ -1,5 +1,5 @@
 
-export default function DisplayQuizResults({ result, restart }) {
+export default function DisplayQuizResults({ result, restart, saveStatus, saveError }) {
     return (
         <div className={styles.wrap}>
             <div className={styles.result}>
@@ -13,6 +13,15 @@ export default function DisplayQuizResults({ result, restart }) {
                         </span>
                     ))}
                 </div>
+                {saveStatus === "saving" ? (
+                    <p className={styles.statusMessage}>Saving your result...</p>
+                ) : null}
+                {saveStatus === "saved" ? (
+                    <p className={styles.statusSuccess}>Saved to your profile.</p>
+                ) : null}
+                {saveStatus === "error" ? (
+                    <p className={styles.statusError}>{saveError}</p>
+                ) : null}
                 <div className={styles.resultActions}>
                     <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={restart}>
                         Retake quiz
@@ -40,6 +49,12 @@ const styles = {
         traitRow: "mb-6 flex flex-wrap justify-center gap-2",
 
         trait: "rounded-full border border-black/10 px-[10px] py-1 text-xs text-[#5a5a55]",
+
+        statusMessage: "mb-4 text-sm text-zinc-500",
+
+        statusSuccess: "mb-4 text-sm text-emerald-600",
+
+        statusError: "mb-4 text-sm text-red-600",
 
         resultActions: "flex justify-center gap-[10px]",
 

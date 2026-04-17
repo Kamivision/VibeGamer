@@ -10,16 +10,16 @@ function getVibe(answers) {
   );
 }
 
-export default function useQuiz({ onComplete, questions = [] }) {
+export default function useQuiz({ onComplete, questions = [], handleQuizComplete }) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [result, setResult] = useState(null);
 
   const progress = questions.length > 0 ? ((current + 1) / questions.length) * 100 : 0;
 
-  function select(i) {
+  function select(index) {
     const next = [...answers];
-    next[current] = i;
+    next[current] = index;
     setAnswers(next);
   }
 
@@ -37,6 +37,8 @@ export default function useQuiz({ onComplete, questions = [] }) {
   function goBack() {
     if (current > 0) setCurrent(current - 1);
   }
+
+ 
 
   function restart() {
     setCurrent(0);

@@ -6,7 +6,7 @@ import {
   Button,
   IconButton,
 } from "@material-tailwind/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import {Link, useNavigate} from "react-router-dom";
 import { handleSignOut } from "../utilities";
 
@@ -25,6 +25,9 @@ function NavItem({ label }) {
 function NavList() {
   return (
     <ul className="mb-4 mt-2 flex flex-col gap-3 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-8">
+      <Link to="/">
+        <NavItem label="Home" />
+      </Link>
       <NavItem label="Genres" />
       <NavItem label="New Releases" />
       <Link to="/library">
@@ -81,7 +84,8 @@ export default function NavBar({ user, setUser }) {
 
         {user ? (
           <div className="hidden items-center gap-3 lg:flex">
-            <Link to="/profile">
+            <Link to="/profile" className="flex items-center gap-2">
+              <UserCircleIcon className="h-6 w-6" />
               <span className="text-sm">{user.username}</span>
             </Link>
             <Button color="gray" onClick={onSignOutClick}>
