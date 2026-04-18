@@ -1,4 +1,3 @@
-
 import DisplayNew from "../components/DisplayNew";
 import { fetchNewReleases } from "../utilities";
 import { useState, useEffect } from "react";
@@ -26,8 +25,8 @@ export default function NewRelease() {
             setNext(data.next || null);
             setPrevious(data.previous || null);
             } catch (error) {
-            console.error("Failed to fetch games:", error);
-            setError(error);
+            setError(console.error("Failed to fetch games:", error));
+            
             } finally {
             setIsLoading(false);
             }

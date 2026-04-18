@@ -108,11 +108,17 @@ class FetchRAWG(APIView):
                 "released": game.get("released"),
                 "rating": game.get("rating"),
                 "background_image": game.get("background_image"),
-                "genres": [genre.get("name") for genre in game.get("genres", [])],
+                "genres": [
+                    genre.get("name")
+                    for genre in (game.get("genres") or [])
+                    if isinstance(genre, dict) and genre.get("name")
+                    ],
                 "platforms": [
                     platform_item.get("platform", {}).get("name")
-                    for platform_item in game.get("platforms", [])
-                    if platform_item.get("platform")
+                    for platform_item in (game.get("platforms") or [])
+                    if isinstance(platform_item, dict)
+                    and isinstance(platform_item.get("platform"), dict)
+                    and platform_item.get("platform", {}).get("name")
                 ],
             }
             for game in results

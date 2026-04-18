@@ -1,3 +1,5 @@
+import GameCard from "./GameCard";
+
 export default function DisplayNew({
   games,
   count,
@@ -27,36 +29,7 @@ export default function DisplayNew({
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {games.map((game) => (
-          <article
-            key={game.id}
-            className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
-          >
-            <img
-              src={game.background_image}
-              alt={game.name}
-              className="h-48 w-full object-cover"
-            />
-
-            <div className="space-y-3 p-4">
-              <h2 className="text-xl font-semibold">{game.name}</h2>
-
-              <p className="text-sm text-gray-600">
-                Released: {game.released || "Unknown"}
-              </p>
-
-              <p className="text-sm text-gray-600">
-                Rating: {game.rating || "N/A"}
-              </p>
-
-              <p className="text-sm text-gray-600">
-                Genres: {game.genres?.join(", ") || "Unknown"}
-              </p>
-
-              <p className="text-sm text-gray-600">
-                Platforms: {game.platforms?.join(", ") || "Unknown"}
-              </p>
-            </div>
-          </article>
+          <GameCard key={game.id} game={game} />
         ))}
       </div>
 

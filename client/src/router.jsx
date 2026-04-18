@@ -7,6 +7,7 @@ import UserLibrary from "./pages/UserLibrary";
 import QuizPage from "./pages/QuizPage";
 import UserProfile from "./pages/UserProfile";
 import NewRelease from "./pages/NewRelease";
+import GenrePage from "./pages/GenrePage";
 
 
 const router = createBrowserRouter([
@@ -38,7 +39,12 @@ const router = createBrowserRouter([
             {
                 path: "new",
                 element: <NewRelease />
-            }
+            },
+            {
+                path: "genre",
+                element: <GenrePage />
+            },
+
 
 
         ]
