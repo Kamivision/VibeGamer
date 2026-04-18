@@ -7,6 +7,10 @@ import {
 import { UserCircleIcon as DefaultAvatar } from "@heroicons/react/24/outline";
 import logoImage from "../assets/logo.jpg";
 import { updateProfile, api } from "../utilities";
+import HeroBannerCard from "../components/layout/HeroBannerCard";
+import PageShell from "../components/layout/PageShell";
+import SectionCard from "../components/layout/SectionCard";
+import { sharedPageStyles } from "../styles/sharedPageStyles";
 
 export default function UserProfile() {
   const { user } = useOutletContext();
@@ -127,92 +131,45 @@ export default function UserProfile() {
 
   return (
     <section className="container mx-auto px-8 py-10">
-      <Card
-        shadow={false}
-        className={styles.card}
-      >
-        <h1 className="flex items-center justify-center text-4xl font-bold text-yellow-300 text-shadow-lg">
-          {user.username}'s Profile
-        </h1>
-        <CardHeader shadow={false} className={styles.header}>
-          <img
-            src={logoImage}
-            alt="dark"
-            className="h-full w-full object-cover object-center"
-          />
-        </CardHeader>
-        <CardBody className="bg-white">
+      <PageShell>
+        <HeroBannerCard
+          title={`${user.username}'s Profile`}
+          imageSrc={logoImage}
+          imageAlt="profile banner"
+        >
           <div className="flex flex-wrap items-center justify-between gap-6 lg:gap-0">
             <div className="flex items-center gap-3">
-              <div className={styles.avatarContainer}>
-                <DefaultAvatar className={styles.avatarIcon} />
+              <div className={sharedPageStyles.avatarWrap}>
+                <DefaultAvatar className={sharedPageStyles.avatarIcon} />
               </div>
 
               <div>
                 <Typography color="blue-gray" variant="h6">
                   {user.username}
                 </Typography>
-
                 <Typography
                   variant="small"
-                  className="font-normal text-gray-600"
+                  className={sharedPageStyles.mutedText}
                 >
                   {user.email}
                 </Typography>
               </div>
-              <button className={styles.btn}>
-                View Library
-              </button>
-              <button className={styles.btn} onClick={handleEditProfile}>
-                Edit Profile
-              </button>
-              <button className={styles.btn}>
-                View Recommendations
-              </button>
             </div>
           </div>
-          <div className="mt-8">
-            <Typography variant="h5" className={styles.sectionTitle}>
-              Gamer Story:
-            </Typography>
-              <Typography variant="body1" className={styles.sectionContent}>
-              This is a placeholder for the user's bio or additional information.
-              You can customize this section to include more details about the user.
-            </Typography>
-          </div>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardBody>
-          <Typography variant="h5" className={styles.sectionTitle}>
-            Your Vibes:
-          </Typography>
-          <Typography variant="body1" className={styles.sectionContent}>
-            Personality: {profile.personality || "Not set"}
-          </Typography>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardBody>
-          <Typography variant="h5" className={styles.sectionTitle}>
-            Your Style:
-          </Typography>
-          <Typography variant="body1" className={styles.sectionContent}>
-            Play Time: {profile.play_time_preference || "Not set"}
-          </Typography>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardBody>
-          <Typography variant="h5" className={styles.sectionTitle}>
-            Recent Games:
-          </Typography>
-          <Typography variant="body1" className={styles.sectionContent}>
-            This is a placeholder for the user's recent games. You can customize
-            this section to display relevant information.
-          </Typography>
-        </CardBody>
-      </Card>
+        </HeroBannerCard>
+
+        <SectionCard title="Your Vibes">
+          <p>Personality: {profile.personality || "Not set"}</p>
+        </SectionCard>
+
+        <SectionCard title="Your Style">
+          <p>Play Time: {profile.play_time_preference || "Not set"}</p>
+        </SectionCard>
+
+        <SectionCard title="Recent Games">
+          <p>Placeholder for recent games.</p>
+        </SectionCard>
+      </PageShell>
     </section>
   );
 }
