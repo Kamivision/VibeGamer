@@ -8,6 +8,40 @@ from .serializers import GameSerializer, SavedGameSerializer
 from user_app.views import UserView
 import requests
 
+# Helper function to normalize RAWG API results
+def normalize_game_results(raw_results):
+    """
+    Transform raw RAWG API game objects into a consistent normalized shape.
+    
+    Args:
+        raw_results: List of game dicts from RAWG API response.
+    
+    Returns:
+        List of normalized game dicts with id, name, released, rating, etc.
+    """
+    return [
+        {
+            "id": game.get("id"),
+            "name": game.get("name"),
+            "released": game.get("released"),
+            "rating": game.get("rating"),
+            "background_image": game.get("background_image"),
+            "genres": [
+                genre.get("name")
+                for genre in (game.get("genres") or [])
+                if isinstance(genre, dict) and genre.get("name")
+            ],
+            "platforms": [
+                platform_item.get("platform", {}).get("name")
+                for platform_item in (game.get("platforms") or [])
+                if isinstance(platform_item, dict)
+                and isinstance(platform_item.get("platform"), dict)
+                and platform_item.get("platform", {}).get("name")
+            ],
+        }
+        for game in raw_results
+    ]
+
 # Create your views here.
 class GameList(APIView):
     def get(self, request):
@@ -64,7 +98,7 @@ class SavedGamesList(UserView):
         serializer = SavedGameSerializer(saved_games, many=True)
         return Response(serializer.data)
     
-# RAWG API integration 
+# RAWG API integration
     
 class FetchRAWG(APIView):
     def get(self, request):
@@ -101,28 +135,7 @@ class FetchRAWG(APIView):
         data = rawg_response.json()
         results = data.get("results", [])
 
-        normalized_results = [
-            {
-                "id": game.get("id"),
-                "name": game.get("name"),
-                "released": game.get("released"),
-                "rating": game.get("rating"),
-                "background_image": game.get("background_image"),
-                "genres": [
-                    genre.get("name")
-                    for genre in (game.get("genres") or [])
-                    if isinstance(genre, dict) and genre.get("name")
-                    ],
-                "platforms": [
-                    platform_item.get("platform", {}).get("name")
-                    for platform_item in (game.get("platforms") or [])
-                    if isinstance(platform_item, dict)
-                    and isinstance(platform_item.get("platform"), dict)
-                    and platform_item.get("platform", {}).get("name")
-                ],
-            }
-            for game in results
-        ]
+        normalized_results = normalize_game_results(results)
 
         return Response(
             {
@@ -133,3 +146,66 @@ class FetchRAWG(APIView):
             },
             status=s.HTTP_200_OK,
         )
+class FetchRecommendations(UserView):
+    def get(self, request):
+        api_key = getattr(settings, "RAWG_KEY", None)
+        if not api_key:
+            return Response(
+                {"error": "RAWG API key is not configured"},
+                status=s.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        user_profile = getattr(request.user, "profile", None)
+        if not user_profile:
+            return Response(
+                {"error": "User profile not found"},
+                status=s.HTTP_404_NOT_FOUND,
+            )
+
+        # Build RAWG params from profile
+        params = {"key": api_key}
+        personality_tags = user_profile.personality_tags or []
+        
+        # Map internal personality_tags to RAWG's "tags" parameter
+        if personality_tags and isinstance(personality_tags, list):
+            params["tags"] = ",".join(personality_tags)
+        else:
+            # Fallback: if no tags, request popular/recent games
+            params["ordering"] = "-rating"
+            params["page_size"] = 12
+
+        rawg_url = "https://api.rawg.io/api/games"
+        
+        try:
+            rawg_response = requests.get(rawg_url, params=params, timeout=10)
+        except requests.RequestException:
+            return Response(
+                {"error": "Unable to reach RAWG API"},
+                status=s.HTTP_502_BAD_GATEWAY,
+            )
+
+        if rawg_response.status_code != 200:
+            return Response(
+                {
+                    "error": "RAWG API returned an error",
+                    "rawg_status": rawg_response.status_code,
+                },
+                status=s.HTTP_502_BAD_GATEWAY,
+            )
+
+        data = rawg_response.json()
+        results = data.get("results", [])
+        normalized_results = normalize_game_results(results)
+
+        return Response(
+            {
+                "count": data.get("count", 0),
+                "next": data.get("next"),
+                "previous": data.get("previous"),
+                "results": normalized_results,
+            },
+            status=s.HTTP_200_OK,
+        )
+
+    
+    
