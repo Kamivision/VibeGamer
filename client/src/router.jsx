@@ -8,6 +8,7 @@ import QuizPage from "./pages/QuizPage";
 import UserProfile from "./pages/UserProfile";
 import NewRelease from "./pages/NewRelease";
 import GenrePage from "./pages/GenrePage";
+import Recommendations from "./pages/Recommendations";
 
 
 const router = createBrowserRouter([
@@ -44,7 +45,11 @@ const router = createBrowserRouter([
                 path: "genre",
                 element: <GenrePage />
             },
+            {
+                path: "recommended",
+                element: <Recommendations />
 
+            }
 
 
         ]
