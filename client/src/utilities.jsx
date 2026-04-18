@@ -93,7 +93,49 @@ export async function saveQuizResult({ personality, quizResults}) {
     personality, quiz_results: quizResults, 
   });
   return response.data;
-} 
+}
+
+export async function updateProfile({ personality, personalityTags, quizResults, playTimePreference }) {
+  const response = await api.put("profile/", { 
+    personality, 
+    personality_tags: personalityTags, 
+    quiz_results: quizResults, 
+    play_time_preference: playTimePreference,
+  });
+  return response.data;
+}
+// Utility function to build query parameters for recommendations based on profile data that will work with RAWG and my backend.
+export function recommendedParams(personalityTags = [], playTimePreference = "") {
+  const params = {};
+
+  const normalizedTags = Array.isArray(personalityTags)
+  // Filter out non-string, empty, or whitespace-only tags, then normalize and deduplicate.
+    ? [...new Set(
+        personalityTags
+          .filter((tag) => typeof tag === "string" && tag.trim().length > 0)
+          .map((tag) => tag.trim().toLowerCase().replace(/\s+/g, "-"))
+      )]
+    : [];
+
+  if (normalizedTags.length > 0) {
+    params.personality_tags = normalizedTags.join(",");
+  }
+
+  const normalizedPlayTime =
+    typeof playTimePreference === "string" ? playTimePreference.trim() : "";
+
+  if (normalizedPlayTime) {
+    params.play_time_preference = normalizedPlayTime;
+  }
+
+  return params;
+}
+
+export async function fetchRecommendedGames(personalityTags = [], playTimePreference = "") {
+  const params = recommendedParams(personalityTags, playTimePreference);
+  const response = await api.get("games/recommendations/", { params });
+  return response.data;
+}
 
 export async function fetchNewReleases(page = 1) {
   const today = new Date();
@@ -136,20 +178,6 @@ export async function fetchGameByGenre(genre, page = 1) {
   return response.data;
 }
 
-export async function fetchRecommendedGames(personality, ) {
-  const response = await api.get("games/recommendations/", {
-    params: { personality },
-  });
-  return response.data;
-}
 
-export async function UpdateProfile({ personality, personalityTags, quizResults, playTimePreference }) {
-  const response = await api.put("profile/", { 
-    personality, 
-    personality_tags: personalityTags, 
-    quiz_results: quizResults, 
-    play_time_preference: playTimePreference,
-  });
-  return response.data;
-}
-     
+
+
