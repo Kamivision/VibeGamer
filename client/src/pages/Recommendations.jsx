@@ -11,5 +11,5 @@ export default function Recommendations() {
       </p>
       {/* Placeholder for recommended games list */}
     </section>
-  );
+  )
 }
