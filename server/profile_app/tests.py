@@ -17,6 +17,7 @@ class ProfileViewTests(APITestCase):
         self.profile = Profile.objects.create(
             user=self.user,
             personality="Chill Explorer",
+            personality_tags=["chill", "explore"],
             quiz_results={"mood": "calm", "style": "explore"},
             play_time_preference="medium",
         )
@@ -43,6 +44,7 @@ class ProfileViewTests(APITestCase):
         self.authenticate()
         payload = {
             "personality": "Focused Strategist",
+            "personality_tags": ["focused", "strategy"],
             "quiz_results": {"mood": "focused", "style": "strategy"},
             "play_time_preference": "long",
         }
@@ -52,5 +54,6 @@ class ProfileViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.profile.refresh_from_db()
         self.assertEqual(self.profile.personality, "Focused Strategist")
+        self.assertEqual(self.profile.personality_tags, ["focused", "strategy"])
         self.assertEqual(self.profile.quiz_results["style"], "strategy")
         self.assertEqual(self.profile.play_time_preference, "long")

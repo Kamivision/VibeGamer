@@ -113,4 +113,43 @@ export async function fetchNewReleases(page = 1) {
   });
   return response.data;
 }
+
+export async function fetchGames(searchTerm, page = 1) {
+  const response = await api.get("games/rawg/", {
+    params: { 
+      search: searchTerm, 
+      page, 
+      page_size: 12 
+    },
+  });
+  return response.data;
+}
+
+export async function fetchGameByGenre(genre, page = 1) {
+  const response = await api.get("games/rawg/", {
+    params: { 
+      genres: genre, 
+      page, 
+      page_size: 12 
+    },
+  });
+  return response.data;
+}
+
+export async function fetchRecommendedGames(personality, ) {
+  const response = await api.get("games/recommendations/", {
+    params: { personality },
+  });
+  return response.data;
+}
+
+export async function UpdateProfile({ personality, personalityTags, quizResults, playTimePreference }) {
+  const response = await api.put("profile/", { 
+    personality, 
+    personality_tags: personalityTags, 
+    quiz_results: quizResults, 
+    play_time_preference: playTimePreference,
+  });
+  return response.data;
+}
      
