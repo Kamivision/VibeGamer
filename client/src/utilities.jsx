@@ -88,9 +88,9 @@ export async function handleSignOut() {
   }
 }
 
-export async function saveQuizResult({ personality, quizResults}) {
+export async function saveQuizResult({ personality, quizResult}) {
   const response = await api.put("profile/", { 
-    personality, quiz_results: quizResults, 
+    personality, quiz_results: quizResult, 
   });
   return response.data;
 }

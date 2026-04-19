@@ -10,7 +10,7 @@ function getVibe(answers) {
   );
 }
 
-export default function useQuiz({ onComplete, questions = [], handleQuizComplete }) {
+export default function useQuiz({ onComplete, questions = [], quizScoring }) {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [result, setResult] = useState(null);
@@ -29,8 +29,9 @@ export default function useQuiz({ onComplete, questions = [], handleQuizComplete
       setCurrent(current + 1);
     } else {
       const vibe = getVibe(answers);
+      const scoring = quizScoring ? quizScoring(answers) : null;
       setResult(vibe);
-      if (onComplete) onComplete({ answers, vibe });
+      if (onComplete) onComplete({ answers, vibe, scoring });
     }
   }
 

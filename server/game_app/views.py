@@ -146,6 +146,21 @@ class FetchRAWG(APIView):
             },
             status=s.HTTP_200_OK,
         )
+
+def create_rec_profile(user_profile):
+    """
+    Create a profile dict for recommendations based on the user's profile data.
+    This can be used to build query parameters for the RAWG API or for internal recommendation logic.
+    """
+    if not user_profile:
+        return {}
+
+    profile_data = {
+        "hard_filters": { "genre_tags": user_profile.genre_tags or [], "platform_tags": user_profile.platform_tags or [], "excluded_tags": user_profile.excluded_tags or [], "ordering": "-rating" },
+        "soft_preferences": { "tags": user_profile.personality_tags or [], "weights": {} }
+    }
+    return profile_data
+
 class FetchRecommendations(UserView):
     def get(self, request):
         api_key = getattr(settings, "RAWG_KEY", None)
