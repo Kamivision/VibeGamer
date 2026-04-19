@@ -1,4 +1,4 @@
-export const genreList = [
+GENRE_TAG_OPTIONS = [
     "Action",
     "Adventure",
     "Arcade",
@@ -18,7 +18,17 @@ export const genreList = [
     "Simulation",
     "Sports",
     "Strategy",
-];
+]
 
-const jsGenreList = JSON.stringify(genreList);
-export default jsGenreList;
+PLATFORM_TAG_OPTIONS = [
+    "PC",
+    "macOS",
+    "Linux",
+    "PlayStation 5",
+    "PlayStation 4",
+    "Xbox Series X/S",
+    "Xbox One",
+    "Nintendo Switch",
+    "iOS",
+    "Android",
+]

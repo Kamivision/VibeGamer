@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from user_app.views import UserView
 from .models import Profile
 from .serializers import ProfileSerializer
+from .tag_options import GENRE_TAG_OPTIONS, PLATFORM_TAG_OPTIONS
 
 # Create your views here.
 class ProfileView(UserView):
@@ -21,4 +22,14 @@ class ProfileView(UserView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=s.HTTP_400_BAD_REQUEST)
+
+
+class ProfileTagOptionsView(UserView):
+    def get(self, request):
+        return Response(
+            {
+                "genre_tags": GENRE_TAG_OPTIONS,
+                "platform_tags": PLATFORM_TAG_OPTIONS,
+            }
+        )
 

@@ -57,3 +57,42 @@ class ProfileViewTests(APITestCase):
         self.assertEqual(self.profile.personality_tags, ["focused", "strategy"])
         self.assertEqual(self.profile.quiz_results["style"], "strategy")
         self.assertEqual(self.profile.play_time_preference, "long")
+
+    def test_put_profile_updates_genre_platform_and_excluded_tags(self):
+        self.authenticate()
+        payload = {
+            "genre_tags": ["Action", "RPG"],
+            "platform_tags": ["PC", "Nintendo Switch"],
+            "excluded_tags": ["Horror", "Competitive"],
+        }
+
+        response = self.client.put(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.genre_tags, ["Action", "RPG"])
+        self.assertEqual(self.profile.platform_tags, ["PC", "Nintendo Switch"])
+        self.assertEqual(self.profile.excluded_tags, ["Horror", "Competitive"])
+
+    def test_put_profile_rejects_invalid_genre_or_platform_tag(self):
+        self.authenticate()
+        payload = {
+            "genre_tags": ["NotARealGenre"],
+            "platform_tags": ["PC"],
+        }
+
+        response = self.client.put(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("genre_tags", response.data)
+
+    def test_get_profile_tag_options(self):
+        self.authenticate()
+
+        response = self.client.get(f"{self.url}options/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("genre_tags", response.data)
+        self.assertIn("platform_tags", response.data)
+        self.assertIn("Action", response.data["genre_tags"])
+        self.assertIn("PC", response.data["platform_tags"])

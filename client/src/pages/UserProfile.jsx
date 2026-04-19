@@ -8,8 +8,6 @@ import BannerCard from "../components/layout/BannerCard";
 import PageShell from "../components/layout/PageShell";
 import SectionCard from "../components/layout/SectionCard";
 import { sharedStyles } from "../styles/sharedStyles";
-import { genreList } from "../data/genreList";
-import { platformList } from "../data/platformList";
 
 // Helper function: turn raw API data into profile
 function buildProfile(data) {
@@ -63,6 +61,7 @@ export default function UserProfile() {
   // Local state for the tags input field (comma-separated string)
   const [tagText, setTagText] = useState("");
   const [excludedTagText, setExcludedTagText] = useState("");
+  const [tagOptions, setTagOptions] = useState({ genre_tags: [], platform_tags: [] });
 
   // Fetch profile on mount
   useEffect(() => {
@@ -72,8 +71,15 @@ export default function UserProfile() {
       setState("loading");
       setError(null);
       try {
-        const response = await api.get("profile/");
-        setProfile(buildProfile(response.data));
+        const [profileResponse, optionsResponse] = await Promise.all([
+          api.get("profile/"),
+          api.get("profile/options/"),
+        ]);
+        setProfile(buildProfile(profileResponse.data));
+        setTagOptions({
+          genre_tags: optionsResponse.data.genre_tags || [],
+          platform_tags: optionsResponse.data.platform_tags || [],
+        });
         setState("viewing");
       } catch (err) {
         setError(err.response?.data?.error || "Failed to load profile");
@@ -95,6 +101,7 @@ export default function UserProfile() {
   function handleEditProfile() {
     setDraftProfile({ ...profile, personality_tags: [...profile.personality_tags], genre_tags: [...profile.genre_tags], platform_tags: [...profile.platform_tags], excluded_tags: [...profile.excluded_tags] });
     setTagText((profile.personality_tags || []).join(", "));
+    setExcludedTagText((profile.excluded_tags || []).join(", "));
     setError(null);
     setState("editing");
   }
@@ -385,7 +392,7 @@ export default function UserProfile() {
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium text-gray-700">Preferred Genres</p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {genreList.map((genre) => (
+                {tagOptions.genre_tags.map((genre) => (
                   <label key={genre} className="flex items-center gap-2 text-sm text-gray-700">
                     <input
                       type="checkbox"
@@ -401,7 +408,7 @@ export default function UserProfile() {
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium text-gray-700">Preferred Platforms</p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {platformList.map((platform) => (
+                {tagOptions.platform_tags.map((platform) => (
                   <label key={platform} className="flex items-center gap-2 text-sm text-gray-700">
                     <input
                       type="checkbox"
