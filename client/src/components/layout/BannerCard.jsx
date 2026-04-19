@@ -1,7 +1,7 @@
 // client/src/components/layout/BannerCard.jsx
 import { Card, CardBody, CardHeader, Typography } from "@material-tailwind/react";
 
-export default function HeroBannerCard({
+export default function BannerCard({
   title,
   imageSrc,
   imageAlt,

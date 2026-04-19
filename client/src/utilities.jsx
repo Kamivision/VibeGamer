@@ -95,12 +95,15 @@ export async function saveQuizResult({ personality, quizResults}) {
   return response.data;
 }
 
-export async function updateProfile({ personality, personalityTags, quizResults, playTimePreference }) {
+export async function updateProfile({ personality, personalityTags, quizResults, playTimePreference, genreTags, platformTags, excludedTags }) {
   const response = await api.put("profile/", { 
     personality, 
     personality_tags: personalityTags, 
     quiz_results: quizResults, 
     play_time_preference: playTimePreference,
+    genre_tags: genreTags,
+    platform_tags: platformTags,
+    excluded_tags: excludedTags,
   });
   return response.data;
 }
@@ -133,7 +136,7 @@ export function recommendedParams(personalityTags = [], playTimePreference = "")
 
 export async function fetchRecommendedGames(personalityTags = [], playTimePreference = "") {
   const params = recommendedParams(personalityTags, playTimePreference);
-  const response = await api.get("games/recommendations/", { params });
+  const response = await api.get("games/recommended/", { params });
   return response.data;
 }
 

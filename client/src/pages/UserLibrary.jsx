@@ -1,18 +1,18 @@
 import imgHolder from "../assets/Games-filler.png";
-import HeroBannerCard from "../components/layout/HeroBannerCard";
+import BannerCard from "../components/layout/BannerCard";
 import PageShell from "../components/layout/PageShell";
 import SectionCard from "../components/layout/SectionCard";
 
 export default function UserLibrary() {
   return (
     <PageShell>
-      <HeroBannerCard
+      <BannerCard
         title="User Library"
         imageSrc={imgHolder}
         imageAlt="library banner"
       >
         <p>This is a placeholder for the helper text.</p>
-      </HeroBannerCard>
+      </BannerCard>
 
       <SectionCard title="Search / Filter">
         <p>This is a placeholder for search and filter controls.</p>
