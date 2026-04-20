@@ -18,7 +18,7 @@ function clearAuthHeader() {
   delete api.defaults.headers.common.Authorization;
 }
 
-function keepSession(token) {
+export function keepSession(token) {
   localStorage.setItem(tokenKey, token);
   setAuthHeader(token);
 }
@@ -75,7 +75,7 @@ export async function handleSignIn(formData) {
 }
 
 export async function handleSignUp(formData) {
-  return authenticateUser("users/register/", formData, 201);
+  return authenticateUser("users/create/", formData, 201);
 }
 
 export async function handleSignOut() {

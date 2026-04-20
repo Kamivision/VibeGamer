@@ -15,6 +15,10 @@ from pathlib import Path
 
 RAWG_KEY = os.environ.get("RAWG_KEY")
 GEMINI_KEY = os.environ.get("GEMINI_KEY")
+STEAM_KEY = os.environ.get("STEAM_KEY")
+ENABLE_STEAM_AUTH = os.environ.get("ENABLE_STEAM_AUTH", "false").lower() == "true"
+GITHUB_CLIENT_ID = os.environ.get("GITHUB_CLIENT_ID")
+GITHUB_CLIENT_SECRET = os.environ.get("GITHUB_CLIENT_SECRET")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
