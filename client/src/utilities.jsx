@@ -181,6 +181,12 @@ export async function fetchGameByGenre(genre, page = 1) {
   return response.data;
 }
 
-
-
-
+export async function fetchVibeExplanation({ gameName, genres = [], personality = "", personalityTags = [] }) {
+  const response = await api.post("vibes/explain/", {
+    game_name: gameName,
+    genres,
+    personality,
+    personality_tags: personalityTags,
+  });
+  return response.data.explanation;
+}

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import PageShell from "../components/layout/PageShell";
 import SectionCard from "../components/layout/SectionCard";
 import GameCard from "../components/GameCard";
 import { fetchRecommendedGames } from "../utilities";
 
 export default function Recommendations() {
+  const { user } = useOutletContext();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,7 +64,7 @@ export default function Recommendations() {
         {!loading && !error && games.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {games.map((game) => (
-              <GameCard key={game.id || game.name} game={game} />
+              <GameCard key={game.id || game.name} game={game} user={user} />
             ))}
           </div>
         ) : null}

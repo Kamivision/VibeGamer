@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 RAWG_KEY = os.environ.get("RAWG_KEY")
+GEMINI_KEY = os.environ.get("GEMINI_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
