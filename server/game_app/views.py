@@ -126,11 +126,25 @@ class GameList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = GameSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=s.HTTP_201_CREATED)
-        return Response(serializer.errors, status=s.HTTP_400_BAD_REQUEST)
+        data = request.data
+        game, created = Game.objects.get_or_create(
+            source=data.get("source", "rawg"),
+            external_id=data.get("external_id", ""),
+            defaults={
+                "slug": data.get("slug", ""),
+                "title": data.get("title", ""),
+                "description": data.get("description", ""),
+                "genre": data.get("genre", ""),
+                "tags": data.get("tags", []),
+                "playtime": data.get("playtime"),
+                "image_url": data.get("image_url", ""),
+                "released_at": data.get("released_at"),
+                "metadata": data.get("metadata", {}),
+            },
+        )
+        serializer = GameSerializer(game)
+        status_code = s.HTTP_201_CREATED if created else s.HTTP_200_OK
+        return Response(serializer.data, status=status_code)
 
 class GameDetail(APIView):
     def get(self, request, game_id):

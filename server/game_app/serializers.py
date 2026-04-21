@@ -7,6 +7,8 @@ class GameSerializer(ModelSerializer):
         fields = '__all__'
 
 class SavedGameSerializer(ModelSerializer):
+    game = GameSerializer(read_only=True)
+
     class Meta:
         model = SavedGame
-        fields = '__all__'
+        fields = ["id", "game", "created_at"]
