@@ -200,3 +200,78 @@ export async function fetchVibeExplanation({ gameName, genres = [], personality 
   });
   return response.data.explanation;
 }
+
+async function ensureGameRecord(rawgGame) {
+  const externalId = rawgGame?.id;
+  if (externalId === undefined || externalId === null) {
+    throw new Error("Game is missing an id and cannot be saved.");
+  }
+
+  const normalizedGenres = Array.isArray(rawgGame?.genres)
+    ? rawgGame.genres
+        .map((genre) => {
+          if (typeof genre === "string") return genre;
+          if (genre && typeof genre === "object") return genre.name || "";
+          return "";
+        })
+        .filter((genre) => typeof genre === "string" && genre.trim().length > 0)
+    : [];
+
+  const primaryGenre = normalizedGenres.length > 0 ? normalizedGenres[0] : "";
+
+  const normalizedPlatforms = Array.isArray(rawgGame?.platforms)
+    ? rawgGame.platforms
+        .map((platform) => {
+          if (typeof platform === "string") return platform;
+          if (platform && typeof platform === "object") {
+            if (typeof platform.name === "string") return platform.name;
+            if (platform.platform && typeof platform.platform === "object") {
+              return platform.platform.name || "";
+            }
+          }
+          return "";
+        })
+        .filter((platform) => typeof platform === "string" && platform.trim().length > 0)
+    : [];
+
+  const response = await api.post("games/", {
+    source: "rawg",
+    external_id: String(externalId),
+    slug: rawgGame.slug || "",
+    title: rawgGame.name || "",
+    description: rawgGame.description_raw || "",
+    genre: primaryGenre,
+    tags: normalizedGenres,
+    playtime: rawgGame.playtime || null,
+    image_url: rawgGame.background_image || "",
+    released_at: rawgGame.released || null,
+    metadata: {
+      rawg_rating: rawgGame.rating || null,
+      platforms: normalizedPlatforms,
+    },
+  });
+
+  return response.data;
+}
+
+export async function addToLibrary(rawgGame) {
+  const game = await ensureGameRecord(rawgGame);
+
+  const saveCheckResponse = await api.get(`games/save/${game.id}/`);
+  if (saveCheckResponse.data.saved) {
+    return { alreadySaved: true, game };
+  }
+
+  const saveResponse = await api.post(`games/save/${game.id}/`);
+  return { alreadySaved: false, game, result: saveResponse.data };
+}
+
+export async function fetchLibrary() {
+  const response = await api.get("games/saved/");
+  return response.data;
+}
+
+export async function removeFromLibrary(gameId) {
+  const response = await api.delete(`games/save/${gameId}/`);
+  return response.data;
+}

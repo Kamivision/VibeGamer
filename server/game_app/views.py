@@ -127,6 +127,10 @@ class GameList(APIView):
 
     def post(self, request):
         data = request.data
+        playtime = data.get("playtime")
+        if playtime is None:
+            playtime = 0
+
         game, created = Game.objects.get_or_create(
             source=data.get("source", "rawg"),
             external_id=data.get("external_id", ""),
@@ -136,7 +140,7 @@ class GameList(APIView):
                 "description": data.get("description", ""),
                 "genre": data.get("genre", ""),
                 "tags": data.get("tags", []),
-                "playtime": data.get("playtime"),
+                "playtime": playtime,
                 "image_url": data.get("image_url", ""),
                 "released_at": data.get("released_at"),
                 "metadata": data.get("metadata", {}),
@@ -146,25 +150,6 @@ class GameList(APIView):
         status_code = s.HTTP_201_CREATED if created else s.HTTP_200_OK
         return Response(serializer.data, status=status_code)
 
-class GameDetail(APIView):
-    def get(self, request, game_id):
-        game = get_object_or_404(Game, pk=game_id)
-        serializer = GameSerializer(game)
-        return Response(serializer.data)
-
-    def put(self, request, game_id):
-        game = get_object_or_404(Game, pk=game_id)
-        serializer = GameSerializer(game, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=s.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, game_id):
-        game = get_object_or_404(Game, pk=game_id)
-        game.delete()
-        return Response(status=s.HTTP_204_NO_CONTENT)
-
 class SavedGameView(UserView):
     def get(self, request, game_id):
         game = get_object_or_404(Game, pk=game_id)
@@ -173,8 +158,17 @@ class SavedGameView(UserView):
     
     def post(self, request, game_id):
         game = get_object_or_404(Game, pk=game_id)
-        saved_game = SavedGame.objects.create(user=request.user, game=game)
-        return Response({"message": f"{game.title} has been saved for {request.user.username}"}, status=s.HTTP_201_CREATED)
+        saved_game, created = SavedGame.objects.get_or_create(user=request.user, game=game)
+        if created:
+            return Response(
+                {"message": f"{game.title} has been saved for {request.user.username}"},
+                status=s.HTTP_201_CREATED,
+            )
+
+        return Response(
+            {"message": f"{game.title} is already saved for {request.user.username}"},
+            status=s.HTTP_200_OK,
+        )
 
     def delete(self, request, game_id):
         game = get_object_or_404(Game, pk=game_id)

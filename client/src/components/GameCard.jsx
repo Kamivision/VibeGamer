@@ -7,13 +7,16 @@ import {
   Typography,
   Button,
 } from "@material-tailwind/react";
-import { fetchVibeExplanation } from "../utilities";
+import { fetchVibeExplanation, addToLibrary, removeFromLibrary } from "../utilities";
 import { useNavigate } from "react-router-dom";
 
 
-export default function GameCard({ game, user }) {
+export default function GameCard({ game, user, onRemoveFromLibrary }) {
   const [explanation, setExplanation] = useState("");
   const [loadingExplanation, setLoadingExplanation] = useState(false);
+  const [savingLibrary, setSavingLibrary] = useState(false);
+  const [libraryMessage, setLibraryMessage] = useState({ text: "", type: "" });
+  const [isSaved, setIsSaved] = useState(Boolean(game?.libraryGameId));
   const navigate = useNavigate();
 
   async function handleWhyClick() {
@@ -38,10 +41,60 @@ export default function GameCard({ game, user }) {
     navigate(`/game/${game.id}`);
   }
 
-  function handleLibraryClick() {
-    // Implement library addition logic here
-    alert("Add to library functionality not implemented yet.");
+  async function handleLibraryClick() {
+    setSavingLibrary(true);
+    setLibraryMessage({ text: "", type: "" });
+
+    try {
+      const result = await addToLibrary(game);
+      if (result.alreadySaved) {
+        setIsSaved(true);
+        setLibraryMessage({ text: "Game is already in your library.", type: "info" });
+      } else {
+        setIsSaved(true);
+        setLibraryMessage({ text: "Game added to your library!", type: "success" });
+      }
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        setLibraryMessage({ text: "Please sign in to save games.", type: "error" });
+      } else {
+        const detail =
+          error?.response?.data?.detail ||
+          error?.response?.data?.error ||
+          error?.message ||
+          "Failed to add game to library.";
+        setLibraryMessage({ text: detail, type: "error" });
+      }
+    } finally {
+      setSavingLibrary(false);
+    }
   }
+
+  async function handleRemoveLibraryClick() {
+    const libraryGameId = game?.libraryGameId || game?.id;
+
+    setSavingLibrary(true);
+    setLibraryMessage({ text: "", type: "" });
+
+    try {
+      await removeFromLibrary(libraryGameId);
+      setIsSaved(false);
+      setLibraryMessage({ text: "Game removed from your library.", type: "success" });
+
+      if (onRemoveFromLibrary) {
+        onRemoveFromLibrary(libraryGameId);
+      }
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        setLibraryMessage({ text: "Please sign in to manage your library.", type: "error" });
+      } else {
+        setLibraryMessage({ text: "Failed to remove game from library.", type: "error" });
+      }
+    } finally {
+      setSavingLibrary(false);
+    }
+  }
+
   return (
     <Card className="overflow-hidden">
       <CardHeader floated={false} shadow={false} className="m-0 rounded-none">
@@ -74,11 +127,26 @@ export default function GameCard({ game, user }) {
         onClick={handleMoreClick} 
         size="sm" 
         className={cardStyle.btn}>More</Button>
+        {isSaved ? (
+          <Button          
+          size="sm" 
+          className={cardStyle.btnActive}
+          onClick={handleRemoveLibraryClick}
+          disabled={savingLibrary}
+          >{savingLibrary ? "Removing..." : "Remove from Library"}</Button>
+        ) : 
         <Button
         onClick={handleLibraryClick} 
         size="sm" 
-        className={cardStyle.btn}>Add to Library</Button>
+        className={cardStyle.btn}
+        disabled={savingLibrary}
+        >{savingLibrary ? "Saving..." : "Add to Library"}</Button>}
       </CardFooter>
+      {libraryMessage.text ? (
+        <Typography className={cardStyle[libraryMessage.type]}>
+          {libraryMessage.text}
+        </Typography>
+      ) : null}
     </Card>
   );
 }
@@ -89,4 +157,7 @@ const cardStyle = {
   btn: "rounded-md bg-purple-500 px-4 py-2 disabled:opacity-50",
   btnActive: "rounded-md bg-cyan-600 px-4 py-2 disabled:opacity-50",
   footer: "pt-0 flex justify-center items-center gap-2",
+  success: "px-4 pb-4 text-sm text-green-700",
+  error: "px-4 pb-4 text-sm text-red-700",
+  info: "px-4 pb-4 text-sm text-blue-700",
 };
