@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import DisplayNew from "../components/DisplayNew";
+import DisplayGames from "../components/DisplayGames";
 import PageShell from "../components/layout/PageShell";
 import { fetchNewReleases } from "../utilities";
 
@@ -36,9 +36,9 @@ export default function NewRelease() {
   return (
     <PageShell
       title="New Releases"
-      subtitle="Browse the latest games pulled from RAWG."
+      subtitle="Browse the latest games."
     >
-      <DisplayNew
+      <DisplayGames
         games={games}
         count={count}
         isLoading={isLoading}

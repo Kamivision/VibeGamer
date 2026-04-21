@@ -159,25 +159,35 @@ export async function fetchNewReleases(page = 1) {
   return response.data;
 }
 
-export async function fetchGames(searchTerm, page = 1) {
+export async function fetchRAWGGames(searchTerm = "", genre = "", platform = "", page = 1, pageSize = 12) {
+  const params = {
+    page,
+    page_size: pageSize,
+  };
+  
+  searchTerm = searchTerm.trim();
+  genre = genre.trim();
+  platform = platform.trim();
+
+  if (searchTerm !== "") {
+    params.search = searchTerm;
+  }
+  if (genre !== "") {
+      params.genres = genre;
+  }
+  if (platform !== "") {
+      params.platforms = platform;
+    }
+  
   const response = await api.get("games/rawg/", {
-    params: { 
-      search: searchTerm, 
-      page, 
-      page_size: 12 
-    },
+    params,
   });
   return response.data;
 }
 
-export async function fetchGameByGenre(genre, page = 1) {
-  const response = await api.get("games/rawg/", {
-    params: { 
-      genres: genre, 
-      page, 
-      page_size: 12 
-    },
-  });
+
+export async function fetchGameDetails(gameId) {
+  const response = await api.get(`games/rawg/${gameId}/`);
   return response.data;
 }
 

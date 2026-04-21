@@ -1,6 +1,6 @@
 import GameCard from "./GameCard";
 
-export default function DisplayNew({
+export default function DisplayGames({
   games,
   count,
   isLoading,

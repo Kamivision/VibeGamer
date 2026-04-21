@@ -8,6 +8,8 @@ import QuizPage from "./pages/QuizPage";
 import UserProfile from "./pages/UserProfile";
 import NewRelease from "./pages/NewRelease";
 import GenrePage from "./pages/GenrePage";
+import GameDetail from "./pages/GameDetail";
+import PlatformPage from "./pages/PlatformPage";
 import Recommendations from "./pages/Recommendations";
 
 
@@ -46,12 +48,18 @@ const router = createBrowserRouter([
                 element: <GenrePage />
             },
             {
+                path: "platform",
+                element: <PlatformPage />
+            },
+            {
                 path: "recommended",
                 element: <Recommendations />
 
+            },
+            {
+                path: "game/:id",
+                element: <GameDetail />
             }
-
-
         ]
     },
 ]);
