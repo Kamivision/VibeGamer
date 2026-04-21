@@ -8,11 +8,13 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { fetchVibeExplanation } from "../utilities";
+import { useNavigate } from "react-router-dom";
 
 
 export default function GameCard({ game, user }) {
   const [explanation, setExplanation] = useState("");
   const [loadingExplanation, setLoadingExplanation] = useState(false);
+  const navigate = useNavigate();
 
   async function handleWhyClick() {
     if (explanation) return;
@@ -32,6 +34,14 @@ export default function GameCard({ game, user }) {
     }
   }
 
+  function handleMoreClick() {
+    navigate(`/game/${game.id}`);
+  }
+
+  function handleLibraryClick() {
+    // Implement library addition logic here
+    alert("Add to library functionality not implemented yet.");
+  }
   return (
     <Card className="overflow-hidden">
       <CardHeader floated={false} shadow={false} className="m-0 rounded-none">
@@ -60,8 +70,14 @@ export default function GameCard({ game, user }) {
         >
           {loadingExplanation ? "..." : "Why?"}
         </Button>
-        <Button size="sm" className={cardStyle.btn}>More</Button>
-        <Button size="sm" className={cardStyle.btn}>Add to Library</Button>
+        <Button
+        onClick={handleMoreClick} 
+        size="sm" 
+        className={cardStyle.btn}>More</Button>
+        <Button
+        onClick={handleLibraryClick} 
+        size="sm" 
+        className={cardStyle.btn}>Add to Library</Button>
       </CardFooter>
     </Card>
   );

@@ -179,17 +179,18 @@ class FetchRecommendationsTests(APITestCase):
             excluded_tags=[],
         )
 
-        mock_get.return_value = self.rawg_response(
-            [
-                {
-                    "id": 201,
-                    "name": "Mapped Query Result",
-                    "genres": [{"name": "Role-Playing Games (RPG)"}],
-                    "platforms": [{"platform": {"name": "Xbox Series X"}}],
-                    "tags": [{"name": "Story Rich"}],
-                }
-            ]
-        )
+        mapped_game = {
+            "id": 201,
+            "name": "Mapped Query Result",
+            "genres": [{"name": "Role-Playing Games (RPG)"}],
+            "platforms": [{"platform": {"name": "Xbox Series X"}}],
+            "tags": [{"name": "Story Rich"}],
+        }
+
+        # Return 8 results so the broad fallback threshold is met and
+        # requests.get is only called once — this test is about slug mapping,
+        # not fallback behavior.
+        mock_get.return_value = self.rawg_response([mapped_game] * 8)
 
         self.authenticate()
         response = self.client.get(self.url)
@@ -200,3 +201,41 @@ class FetchRecommendationsTests(APITestCase):
         params = mock_get.call_args.kwargs["params"]
         self.assertEqual(params.get("genres"), "role-playing-games-rpg")
         self.assertEqual(params.get("platforms"), "xbox-series-x")
+
+
+class FetchRAWGDetailTests(APITestCase):
+    def setUp(self):
+        self.url = "/api/v1/games/rawg/3498/"
+
+    @patch("game_app.views.requests.get")
+    @patch("game_app.views.settings.RAWG_KEY", "test-rawg-key")
+    def test_rawg_detail_returns_game_payload(self, mock_get):
+        payload = {
+            "id": 3498,
+            "name": "Grand Theft Auto V",
+            "description": "Action-adventure game",
+            "rating": 4.47,
+            "esrb_rating": {"name": "Mature"},
+            "genres": [{"name": "Action"}],
+            "platforms": [{"platform": {"name": "PC"}}],
+            "stores": [{"store": {"name": "Steam"}}],
+            "developers": [{"name": "Rockstar North"}],
+        }
+
+        response = Mock()
+        response.status_code = status.HTTP_200_OK
+        response.json.return_value = payload
+        mock_get.return_value = response
+
+        api_response = self.client.get(self.url)
+
+        self.assertEqual(api_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(api_response.data["id"], 3498)  # type: ignore
+        self.assertEqual(api_response.data["name"], "Grand Theft Auto V")  # type: ignore
+
+    @patch("game_app.views.settings.RAWG_KEY", None)
+    def test_rawg_detail_returns_500_when_key_is_missing(self):
+        api_response = self.client.get(self.url)
+
+        self.assertEqual(api_response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(api_response.data["error"], "RAWG API key is not configured")  # type: ignore

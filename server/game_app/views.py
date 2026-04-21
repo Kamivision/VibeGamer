@@ -223,6 +223,44 @@ class FetchRAWG(APIView):
             status=s.HTTP_200_OK,
         )
 
+
+class FetchRAWGDetail(APIView):
+    def get(self, request, game_id):
+        api_key = getattr(settings, "RAWG_KEY", None)
+        if not api_key:
+            return Response(
+                {"error": "RAWG API key is not configured"},
+                status=s.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        rawg_url = f"https://api.rawg.io/api/games/{game_id}"
+        params = {"key": api_key}
+
+        try:
+            rawg_response = requests.get(rawg_url, params=params, timeout=10)
+        except requests.RequestException:
+            return Response(
+                {"error": "Unable to reach RAWG API"},
+                status=s.HTTP_502_BAD_GATEWAY,
+            )
+
+        if rawg_response.status_code == 404:
+            return Response(
+                {"error": "Game not found"},
+                status=s.HTTP_404_NOT_FOUND,
+            )
+
+        if rawg_response.status_code != 200:
+            return Response(
+                {
+                    "error": "RAWG API returned an error",
+                    "rawg_status": rawg_response.status_code,
+                },
+                status=s.HTTP_502_BAD_GATEWAY,
+            )
+
+        return Response(rawg_response.json(), status=s.HTTP_200_OK)
+
 def create_rec_profile(user_profile):
     """
     Create a profile dict for recommendations based on the user's profile data.

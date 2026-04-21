@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchGameByPlatform } from "../utilities";
+import { fetchRAWGGames } from "../utilities";
 import PageShell from "../components/layout/PageShell";
 import DisplayGames from "../components/DisplayGames";
 
