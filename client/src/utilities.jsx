@@ -88,10 +88,28 @@ export async function handleSignOut() {
   }
 }
 
-export async function saveQuizResult({ personality, quizResult}) {
+function traitsToPersonalityTags(vibeTraits = []) {
+  if (!Array.isArray(vibeTraits)) {
+    return [];
+  }
+
+  return [...new Set(
+    vibeTraits
+      .filter((trait) => typeof trait === "string" && trait.trim().length > 0)
+      .map((trait) => trait.trim().toLowerCase().replace(/\s+/g, "-"))
+  )];
+}
+
+export async function saveQuizResult({ personality, quizResult, vibeTraits = [] }) {
+  const personalityTags = traitsToPersonalityTags(vibeTraits);
+
   const response = await api.put("profile/", { 
-    personality, quiz_results: quizResult, 
+    personality,
+    quiz_results: quizResult,
+    vibe_traits: Array.isArray(vibeTraits) ? vibeTraits : [],
+    personality_tags: personalityTags,
   });
+
   return response.data;
 }
 
@@ -108,10 +126,10 @@ export async function updateProfile({ personality, personalityTags, quizResults,
   return response.data;
 }
 // Utility function to build query parameters for recommendations based on profile data that will work with RAWG and my backend.
-export function recommendedParams(personalityTags = [], playTimePreference = "") {
+export function recommendedParams(personalityTags = [], playTimePreference = "", genreTags = [], platformTags = [], excludedTags = []) {
   const params = {};
 
-  const normalizedTags = Array.isArray(personalityTags)
+  const normalizedPersonalityTags = Array.isArray(personalityTags)
   // Filter out non-string, empty, or whitespace-only tags, then normalize and deduplicate.
     ? [...new Set(
         personalityTags
@@ -120,8 +138,8 @@ export function recommendedParams(personalityTags = [], playTimePreference = "")
       )]
     : [];
 
-  if (normalizedTags.length > 0) {
-    params.personality_tags = normalizedTags.join(",");
+  if (normalizedPersonalityTags.length > 0) {
+    params.personality_tags = normalizedPersonalityTags.join(",");
   }
 
   const normalizedPlayTime =
@@ -131,11 +149,41 @@ export function recommendedParams(personalityTags = [], playTimePreference = "")
     params.play_time_preference = normalizedPlayTime;
   }
 
+  const normalizedGenreTags = Array.isArray(genreTags)
+    ? genreTags
+        .filter((tag) => typeof tag === "string" && tag.trim().length > 0)
+        .map((tag) => tag.trim().toLowerCase().replace(/\s+/g, "-"))
+    : [];
+
+  if (normalizedGenreTags.length > 0) {
+    params.genre_tags = normalizedGenreTags.join(",");
+  }
+
+  const normalizedPlatformTags = Array.isArray(platformTags)
+    ? platformTags
+        .filter((tag) => typeof tag === "string" && tag.trim().length > 0)
+        .map((tag) => tag.trim().toLowerCase().replace(/\s+/g, "-"))
+    : [];
+
+  if (normalizedPlatformTags.length > 0) {
+    params.platform_tags = normalizedPlatformTags.join(",");
+  }
+
+  const normalizedExcludedTags = Array.isArray(excludedTags)
+    ? excludedTags
+        .filter((tag) => typeof tag === "string" && tag.trim().length > 0)
+        .map((tag) => tag.trim().toLowerCase().replace(/\s+/g, "-"))
+    : [];
+
+  if (normalizedExcludedTags.length > 0) {
+    params.excluded_tags = normalizedExcludedTags.join(",");
+  }
+
   return params;
 }
 
-export async function fetchRecommendedGames(personalityTags = [], playTimePreference = "") {
-  const params = recommendedParams(personalityTags, playTimePreference);
+export async function fetchRecommendedGames(personalityTags = [], playTimePreference = "", genreTags = [], platformTags = [], excludedTags = []) {
+  const params = recommendedParams(personalityTags, playTimePreference, genreTags, platformTags, excludedTags);
   const response = await api.get("games/recommended/", { params });
   return response.data;
 }

@@ -291,10 +291,10 @@ def create_rec_profile(user_profile):
         "hard_filters": { 
             "genre_tags": user_profile.genre_tags or [], 
             "platform_tags": user_profile.platform_tags or [], 
-            "excluded_tags": user_profile.excluded_tags or [], 
             "ordering": "-rating" },
         "soft_preferences": { 
-            "tags": user_profile.personality_tags or [], 
+            "tags": user_profile.personality_tags or [],
+            "excluded_tags": user_profile.excluded_tags or [],  
             "top_intents": top_intents,
             "intent_scores": intent_scores
             }
@@ -303,6 +303,7 @@ def create_rec_profile(user_profile):
 
 
 def apply_excluded_tags(raw_results, excluded_tags):
+    """Soft-filter excluded tags by demoting matches instead of removing games."""
     if not isinstance(excluded_tags, list) or len(excluded_tags) == 0:
         return raw_results
 
@@ -315,8 +316,12 @@ def apply_excluded_tags(raw_results, excluded_tags):
     if len(excluded_slugs) == 0:
         return raw_results
 
-    filtered = []
-    for game in raw_results:
+    scored_results = []
+
+    for index, game in enumerate(raw_results or []):
+        if not isinstance(game, dict):
+            continue
+
         game_labels = set()
 
         genres = game.get("genres") or []
@@ -335,10 +340,16 @@ def apply_excluded_tags(raw_results, excluded_tags):
                 if slug:
                     game_labels.add(slug)
 
-        if excluded_slugs.isdisjoint(game_labels):
-            filtered.append(game)
+        excluded_match_count = len(game_labels.intersection(excluded_slugs))
+        rating = game.get("rating")
+        rating_value = rating if isinstance(rating, (int, float)) else 0
 
-    return filtered
+        # Fewer excluded-tag matches rank higher; higher rating breaks ties.
+        scored_results.append((excluded_match_count, -rating_value, index, game))
+
+    scored_results.sort(key=lambda item: (item[0], item[1], item[2]))
+
+    return [item[3] for item in scored_results]
 
 class FetchRecommendations(UserView):
     def get(self, request):
@@ -466,7 +477,7 @@ class FetchRecommendations(UserView):
         results = chosen_data.get("results", [])
         debug["chosen_pre_exclusion_count"] = len(results)
 
-        excluded_tags = hard_filters.get("excluded_tags", [])
+        excluded_tags = soft_preferences.get("excluded_tags", [])
         filtered_results = apply_excluded_tags(results, excluded_tags)
         debug["after_exclusion_count"] = len(filtered_results)
 

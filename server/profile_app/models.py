@@ -5,6 +5,7 @@ from .validators import validate_genre_tags, validate_platform_tags
 class Profile(models.Model):
     user = models.OneToOneField("user_app.User", on_delete=models.CASCADE, related_name="profile")
     personality = models.CharField(max_length=255, blank=True, null=True)
+    vibe_traits = models.JSONField(blank=True, null=True)
     personality_tags = models.JSONField(blank=True, null=True)
     quiz_results = models.JSONField(blank=True, null=True)
     genre_tags = models.JSONField(blank=True, null=True, validators=[validate_genre_tags])

@@ -1,5 +1,12 @@
+import { useNavigate } from "react-router-dom";
 
 export default function DisplayQuizResults({ result, restart, saveStatus, saveError }) {
+    const navigate = useNavigate();
+
+    const handleRecClick = () => {
+        navigate("/recommended");
+    };
+
     return (
         <div className={styles.wrap}>
             <div className={styles.result}>
@@ -23,10 +30,16 @@ export default function DisplayQuizResults({ result, restart, saveStatus, saveEr
                     <p className={styles.statusError}>{saveError}</p>
                 ) : null}
                 <div className={styles.resultActions}>
-                    <button type="button" className={`${styles.btn} ${styles.btnGhost}`} onClick={restart}>
+                    <button 
+                    type="button" 
+                    className={`${styles.btn} ${styles.btnGhost}`} 
+                    onClick={restart}>
                         Retake quiz
                     </button>
-                    <button type="button" className={`${styles.btn} ${styles.btnPrimary}`}>
+                    <button
+                    onClick={handleRecClick}
+                    type="button" 
+                    className={`${styles.btn} ${styles.btnPrimary}`}>
                         Find my games
                     </button>
                 </div>

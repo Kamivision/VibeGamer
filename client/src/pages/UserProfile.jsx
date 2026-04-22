@@ -13,6 +13,7 @@ import { sharedStyles } from "../styles/sharedStyles";
 function buildProfile(data) {
   return {
     personality: data.personality || null,
+    vibe_traits: data.vibe_traits || [],
     play_time_preference: data.play_time_preference || null,
     personality_tags: data.personality_tags || [],
     genre_tags: data.genre_tags || [],
@@ -47,6 +48,7 @@ export default function UserProfile() {
   // Profile data from API
   const [profile, setProfile] = useState({
     personality: null,
+    vibe_traits: [],
     play_time_preference: null,
     personality_tags: [],
     genre_tags: [],
@@ -303,6 +305,12 @@ export default function UserProfile() {
         {!isEditing ? (
           <>
             <p>Personality: {profile.personality || "Not set"}</p>
+            <p>
+              Vibe Traits:{" "}
+              {Array.isArray(profile.vibe_traits) && profile.vibe_traits.length > 0
+                ? profile.vibe_traits.join(", ")
+                : "Not set"}
+            </p>
             <p>
               Tags:{" "}
               {profile.personality_tags.length > 0

@@ -3,7 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import PageShell from "../components/layout/PageShell";
 import SectionCard from "../components/layout/SectionCard";
 import GameCard from "../components/GameCard";
-import { fetchRecommendedGames } from "../utilities";
+import { api, fetchRecommendedGames } from "../utilities";
 
 export default function Recommendations() {
   const { user } = useOutletContext();
@@ -20,13 +20,31 @@ export default function Recommendations() {
       setError("");
 
       try {
-        const data = await fetchRecommendedGames();
+        const profileResponse = await api.get("profile/");
+        const genreTags = Array.isArray(profileResponse?.data?.genre_tags)
+          ? profileResponse.data.genre_tags
+          : [];
+        const platformTags = Array.isArray(profileResponse?.data?.platform_tags)
+          ? profileResponse.data.platform_tags
+          : [];
+        const excludedTags = Array.isArray(profileResponse?.data?.excluded_tags)
+          ? profileResponse.data.excluded_tags
+          : [];
+        const personalityTags = Array.isArray(profileResponse?.data?.personality_tags)
+          ? profileResponse.data.personality_tags
+          : [];
+        const playTimePreference =
+          typeof profileResponse?.data?.play_time_preference === "string"
+            ? profileResponse.data.play_time_preference
+            : "";
+
+        const data = await fetchRecommendedGames(personalityTags, playTimePreference, genreTags, platformTags, excludedTags);
 
         if (!isMounted) return;
 
         setGames(Array.isArray(data?.results) ? data.results : []);
         setStrategy(typeof data?.strategy === "string" ? data.strategy : "");
-      } catch (err) {
+      } catch {
         if (!isMounted) return;
         setError("We could not load your recommendations right now.");
       } finally {
@@ -46,16 +64,12 @@ export default function Recommendations() {
   return (
     <PageShell
       title="Your Game Recommendations"
-      subtitle="Based on your gamer profile, here are some games we think you'll love."
+      subtitle="Based on your Vibe Profile, here are some games we think you'll love."
     >
-      <SectionCard title="Recommended For You">
+      <SectionCard title="Recommendation Type:">
         {loading ? <p>Loading recommendations...</p> : null}
 
         {!loading && error ? <p className="text-red-600">{error}</p> : null}
-
-        {!loading && !error && strategy ? (
-          <p className="mb-4 text-sm text-gray-600">Recommendation mode: {strategy}</p>
-        ) : null}
 
         {!loading && !error && games.length === 0 ? (
           <p>No recommendations yet. Try updating your profile tags and quiz results.</p>

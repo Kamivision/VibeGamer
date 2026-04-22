@@ -29,7 +29,11 @@ export default function QuizPage() {
     };
 
     try {
-      await saveQuizResult({ personality: vibe.name, quizResult });
+      await saveQuizResult({
+        personality: vibe.name,
+        quizResult,
+        vibeTraits: vibe.traits,
+      });
       setSaveStatus("saved");
     } catch (error) {
       setSaveStatus("error");
