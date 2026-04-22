@@ -11,6 +11,7 @@ class Game(models.Model):
     slug = models.SlugField(max_length=255, blank=True)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    developer = models.CharField(max_length=255, blank=True)
     genre = models.CharField(max_length=100, blank=True)
     tags = models.JSONField(default=list, blank=True)
     playtime = models.PositiveIntegerField(blank=True, null=True)

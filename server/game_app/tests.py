@@ -48,8 +48,36 @@ class SavedGameTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["user"], self.user.id) # type: ignore
-        self.assertEqual(response.data[0]["game"], self.game.id) # type: ignore
+        self.assertEqual(response.data[0]["game"]["id"], self.game.id) # type: ignore
+
+    def test_get_saved_games_excludes_other_users(self):
+        other_user = User.objects.create_user(
+            email="other@example.com",
+            username="otheruser",
+            password="password123",
+        )
+        other_game = Game.objects.create(
+            source="rawg",
+            external_id="4200",
+            slug="portal-2",
+            title="Portal 2",
+            description="Puzzle platformer",
+            genre="Puzzle",
+            tags=["puzzle"],
+            playtime=10,
+            image_url="https://example.com/portal2.jpg",
+            metadata={"rating": 4.9},
+        )
+
+        SavedGame.objects.create(user=self.user, game=self.game)
+        SavedGame.objects.create(user=other_user, game=other_game)
+
+        self.authenticate()
+        response = self.client.get(self.saved_list_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["game"]["id"], self.game.id) # type: ignore
 
     def test_post_save_creates_saved_game(self):
         self.authenticate()
@@ -58,6 +86,18 @@ class SavedGameTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
             SavedGame.objects.filter(user=self.user, game=self.game).exists()
+        )
+
+    def test_post_save_returns_200_when_already_saved(self):
+        SavedGame.objects.create(user=self.user, game=self.game)
+
+        self.authenticate()
+        response = self.client.post(self.save_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            SavedGame.objects.filter(user=self.user, game=self.game).count(),
+            1,
         )
 
     def test_delete_save_removes_saved_game(self):
@@ -70,6 +110,54 @@ class SavedGameTests(APITestCase):
         self.assertFalse(
             SavedGame.objects.filter(user=self.user, game=self.game).exists()
         )
+
+
+class GameLibraryFlowTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email="flow@example.com",
+            username="flowuser",
+            password="password123",
+        )
+        self.token = Token.objects.create(user=self.user)
+        self.create_game_url = "/api/v1/games/"
+        self.saved_list_url = "/api/v1/games/saved/"
+
+    def authenticate(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
+
+    def test_create_then_save_then_list_flow(self):
+        create_payload = {
+            "source": "rawg",
+            "external_id": "6789",
+            "slug": "test-game",
+            "title": "Test Game",
+            "description": "API flow test game",
+            "developer": "Test Studio",
+            "genre": "Action",
+            "tags": ["action", "singleplayer"],
+            "playtime": 12,
+            "image_url": "https://example.com/test-game.jpg",
+            "released_at": "2026-01-01",
+            "metadata": {
+                "rawg_rating": 4.0,
+                "platforms": ["PC"],
+            },
+        }
+
+        create_response = self.client.post(self.create_game_url, create_payload, format="json")
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        game_id = create_response.data["id"]  # type: ignore
+
+        self.authenticate()
+        save_response = self.client.post(f"/api/v1/games/save/{game_id}/")
+        self.assertEqual(save_response.status_code, status.HTTP_201_CREATED)
+
+        saved_list_response = self.client.get(self.saved_list_url)
+        self.assertEqual(saved_list_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(saved_list_response.data), 1)
+        self.assertEqual(saved_list_response.data[0]["game"]["id"], game_id)  # type: ignore
+        self.assertEqual(saved_list_response.data[0]["game"]["external_id"], "6789")  # type: ignore
 
 
 class FetchRecommendationsTests(APITestCase):

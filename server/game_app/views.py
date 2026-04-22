@@ -128,7 +128,7 @@ class GameList(APIView):
     def post(self, request):
         data = request.data
         playtime = data.get("playtime")
-        if playtime is None:
+        if playtime is None or playtime == "null":
             playtime = 0
 
         game, created = Game.objects.get_or_create(
