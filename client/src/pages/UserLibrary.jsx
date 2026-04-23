@@ -1,12 +1,18 @@
 import imgHolder from "../assets/Games-filler.png";
+import logoName from "../assets/logo-name.jpg";
 import BannerCard from "../components/layout/BannerCard";
 import PageShell from "../components/layout/PageShell";
 import SectionCard from "../components/layout/SectionCard";
 import DisplayGames from "../components/DisplayGames";
 import { useState, useEffect } from "react";
+import { useNavigate, Navigate, useOutletContext } from "react-router-dom";
 import { fetchLibrary } from "../utilities";
+import SearchForm from "../components/SearchForm";
+import { sharedStyles } from "../styles/sharedStyles";
 
 export default function UserLibrary() {
+  const { user } = useOutletContext();
+  const navigate = useNavigate();
   const [library, setLibrary] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -30,6 +36,10 @@ export default function UserLibrary() {
   }
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+
     async function loadLibrary() {
       setIsLoading(true);
       setErrorMessage("");
@@ -52,7 +62,11 @@ export default function UserLibrary() {
     }
 
     loadLibrary();
-  }, []);
+  }, [user]);
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
 
   function handleRemoveFromLibrary(libraryGameId) {
     setLibrary((currentLibrary) =>
@@ -63,15 +77,28 @@ export default function UserLibrary() {
   return (
     <PageShell>
       <BannerCard
-        title="User Library"
-        imageSrc={imgHolder}
+        title={`${user.username}'s Game Library`}
+        imageSrc={logoName}
         imageAlt="library banner"
       >
-        <p>Track saved games.</p>
+        <button
+          type="button"
+          className={sharedStyles.actionBtn}
+          onClick={() => navigate("/recommended")}
+        >
+          View Recommendations
+        </button>
+        <button
+          type="button"
+          className={sharedStyles.actionBtn}
+          onClick={() => navigate("/quiz")}
+        >
+          Take Quiz
+        </button>
       </BannerCard>
 
-      <SectionCard title="Search / Filter">
-        <p>This is a placeholder for search and filter controls.</p>
+      <SectionCard title="Search">
+        <SearchForm />
       </SectionCard>
 
       <SectionCard title="Your Saved Games">
@@ -84,9 +111,9 @@ export default function UserLibrary() {
         />
       </SectionCard>
 
-      <SectionCard title="Your Owned Games">
+      {/* <SectionCard title="Your Owned Games">
         <p>This is a placeholder for the user's owned games.</p>
-      </SectionCard>
+      </SectionCard> */}
     </PageShell>
   );
 }

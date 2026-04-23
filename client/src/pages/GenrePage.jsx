@@ -20,7 +20,7 @@ export default function GenrePage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchRAWGGames("", "", genre, page);
+        const data = await fetchRAWGGames("", genre, "", page);
         setGames(data.results || []);
         setCount(data.count || 0);
         setNext(data.next || null);

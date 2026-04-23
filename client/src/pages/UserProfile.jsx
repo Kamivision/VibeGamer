@@ -389,11 +389,11 @@ export default function UserProfile() {
                 onChange={(e) => handleDraftChange("play_time_preference", e.target.value)}
               >
                 <option value="">Select a preference</option>
-                <option value="quick">Quickie session (under 30 min)</option>
-                <option value="short"> Short and Sweet (up to 1 hour)</option>
-                <option value="medium"> I've got some time (up to 2 hours)</option>
-                <option value="long"> True gamer sesh (up to 4 hours)</option>
-                <option value="epic"> All the time in the world (4 hours+)</option>
+                <option value="quick">Quick (under 30 min)</option>
+                <option value="short"> Short (up to 1 hour)</option>
+                <option value="medium"> Medium (up to 2 hours)</option>
+                <option value="long"> Long (up to 4 hours)</option>
+                <option value="epic"> Epic (4 hours+)</option>
               </select>
             </div>
 

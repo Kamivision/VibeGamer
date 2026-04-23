@@ -6,7 +6,7 @@ export default function PageShell({ title, subtitle, children }) {
     <section className="container mx-auto px-8 py-10">
       {title ? (
         <header className="mb-6 text-center">
-          <Typography variant="h2" className="text-4xl font-bold">
+          <Typography variant="h2" className="text-4xl font-bold text-black">
             {title}
           </Typography>
           {subtitle ? (
