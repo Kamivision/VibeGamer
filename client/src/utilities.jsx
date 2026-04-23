@@ -207,10 +207,23 @@ export async function fetchNewReleases(page = 1) {
   return response.data;
 }
 
-export async function fetchRAWGGames(searchTerm = "", genre = "", platform = "", page = 1, pageSize = 12) {
+export async function fetchFeaturedGames(page = 1) {
+  const response = await api.get("games/rawg/", {
+    params: {
+      ordering: "-rating_top",
+      dates: "2026-01-01,2026-12-31",
+      page,
+      page_size: 6,
+    },
+  });
+  return response.data;
+}
+
+export async function fetchRAWGGames(searchTerm = "", genre = "", platform = "", page = 1, pageSize = 12, ordering = "-rating_top") {
   const params = {
     page,
     page_size: pageSize,
+    ordering,
   };
   
   searchTerm = searchTerm.trim();
