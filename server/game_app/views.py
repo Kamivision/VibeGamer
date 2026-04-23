@@ -22,6 +22,20 @@ PLATFORM_SLUG_MAP = {
     "Android": "android",
 }
 
+# RAWG requires numeric platform IDs for the games list endpoint.
+RAWG_PLATFORM_IDS = {
+    "pc": 4,
+    "playstation5": 187,
+    "playstation4": 18,
+    "xbox-series-x": 186,
+    "xbox-one": 1,
+    "nintendo-switch": 7,
+    "ios": 3,
+    "android": 21,
+    "macos": 5,
+    "linux": 6,
+}
+
 GENRE_SLUG_MAP = {
     "RPG": "role-playing-games-rpg",
     "Massively Multiplayer": "massively-multiplayer",
@@ -198,6 +212,32 @@ class FetchRAWG(APIView):
         # Pass through client filters (search, page, genres, platforms, ordering, etc.)
         params = request.query_params.copy()
         params["key"] = api_key
+
+        # Normalize genre labels to RAWG-compatible slugs (e.g. "RPG" → "role-playing-games-rpg").
+        if "genres" in params:
+            raw_genres = [g.strip() for g in params["genres"].split(",") if g.strip()]
+            genre_slugs = [
+                resolve_mapped_slug(g, GENRE_SLUG_MAP, GENRE_SLUG_ALIASES)
+                for g in raw_genres
+            ]
+            genre_slugs = [slug for slug in genre_slugs if slug]
+            if genre_slugs:
+                params["genres"] = ",".join(genre_slugs)
+            else:
+                del params["genres"]
+
+        # RAWG games list requires numeric platform IDs, not slugs.
+        if "platforms" in params:
+            raw_slugs = [s.strip() for s in params["platforms"].split(",") if s.strip()]
+            platform_ids = [
+                str(RAWG_PLATFORM_IDS[slug])
+                for slug in raw_slugs
+                if slug in RAWG_PLATFORM_IDS
+            ]
+            if platform_ids:
+                params["platforms"] = ",".join(platform_ids)
+            else:
+                del params["platforms"]
 
         try:
             rawg_response = requests.get(rawg_url, params=params, timeout=10)

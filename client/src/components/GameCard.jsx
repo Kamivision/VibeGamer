@@ -11,7 +11,10 @@ import { fetchVibeExplanation, addToLibrary, removeFromLibrary } from "../utilit
 import { useNavigate } from "react-router-dom";
 
 
-export default function GameCard({ game, user, onRemoveFromLibrary }) {
+// showWhyButton is a new prop (true/false). When it is true, the "Why this game?" button
+// will be displayed on the card. When it is false or not provided, the button is hidden.
+// This lets us reuse GameCard everywhere but only show that button on the Recommendations page.
+export default function GameCard({ game, user, onRemoveFromLibrary, showWhyButton }) {
   const [explanation, setExplanation] = useState("");
   const [loadingExplanation, setLoadingExplanation] = useState(false);
   const [savingLibrary, setSavingLibrary] = useState(false);
@@ -115,18 +118,23 @@ export default function GameCard({ game, user, onRemoveFromLibrary }) {
         ) : null}
       </CardBody>
       <CardFooter className={cardStyle.footer}>
-        <Button
-          size="sm"
-          className={explanation ? cardStyle.btnActive : cardStyle.btn}
-          onClick={handleWhyClick}
-          disabled={loadingExplanation || !!explanation}
-        >
-          {loadingExplanation ? "..." : "Why?"}
-        </Button>
+        {/* Only render the "Why this game?" button when showWhyButton is true.
+            The double exclamation mark (!!) turns the value into a strict true/false boolean.
+            So if showWhyButton is undefined (not passed at all), !!undefined === false, and the button stays hidden. */}
+        {!!showWhyButton ? (
+          <Button
+            size="sm"
+            className={explanation ? cardStyle.btnActive : cardStyle.btn}
+            onClick={handleWhyClick}
+            disabled={loadingExplanation || !!explanation}
+          >
+            {loadingExplanation ? "..." : "Why this game?"}
+          </Button>
+        ) : null}
         <Button
         onClick={handleMoreClick} 
         size="sm" 
-        className={cardStyle.btn}>More</Button>
+        className={cardStyle.btn}>View More</Button>
         {isSaved ? (
           <Button          
           size="sm" 

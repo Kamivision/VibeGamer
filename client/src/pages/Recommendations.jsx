@@ -78,7 +78,9 @@ export default function Recommendations() {
         {!loading && !error && games.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {games.map((game) => (
-              <GameCard key={game.id || game.name} game={game} user={user} />
+              // showWhyButton={true} tells GameCard to display the "Why this game?" button.
+              // We only pass this here on the Recommendations page, so it won't appear anywhere else.
+              <GameCard key={game.id || game.name} game={game} user={user} showWhyButton={true} />
             ))}
           </div>
         ) : null}

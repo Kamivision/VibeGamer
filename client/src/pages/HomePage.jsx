@@ -56,8 +56,10 @@ export default function HomePage() {
                     <span className="text-center mb-8 text-5xl font-semibold text-purple-300 hover:text-purple-500 bg-black bg-opacity-50">Explore New Releases</span>
                 </Link>
             </div>
-            <Button variant="gradient" color="purple" className="mx-auto mt-8 mb-8 hover:animate-bounce" onClick={handlePCGamesClick}>  
-                Browse PC Games    
+            <Button variant="gradient" color="purple" className="mx-auto mt-8 mb-8 hover:animate-bounce text-xl">
+                <Link to="/platform/pc" className="block w-full h-full text-white text-xl text-center">
+                    Browse PC Games
+                </Link>
             </Button>
             <SectionCard title="Featured Games">
                 <DisplayGames 
@@ -69,26 +71,3 @@ export default function HomePage() {
     );
 }
 
-//     return (
-//         <div className="home-page">
-//             <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center py-12 mb-8 rounded-lg">
-//             <img 
-//                 src={logo} 
-//                 alt="VibeGamer" 
-//                 className="rounded-full w-150 h-100 mx-auto" />
-//             <h1 className="text-4xl font-bold pt-4">Welcome to Vibe Gamer!</h1>
-//             <p>Discover your next favorite game.</p>
-//             </div>
-//             <img 
-//             src={imgHolder} 
-//             alt="Games coming soon"
-//             className=" mt-4 mb-4 object-cover w-full h-full" />
-//             <SectionCard title="Featured Games">
-//                 <DisplayGames 
-//                 games={featuredGames} 
-//                 isLoading={isLoading} 
-//                 error={error} />
-//             </SectionCard>
-//         </div>
-//     );
-// }

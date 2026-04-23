@@ -44,11 +44,11 @@ const router = createBrowserRouter([
                 element: <NewRelease />
             },
             {
-                path: "genre",
+                path: "genre/:genre",
                 element: <GenrePage />
             },
             {
-                path: "platform",
+                path: "platform/:platform",
                 element: <PlatformPage />
             },
             {
