@@ -1,14 +1,13 @@
-import imgHolder from "../assets/Games-filler.png";
-import logo from "../assets/logo2.jpg";
 import { useState, useEffect } from "react";
 import DisplayGames from "../components/DisplayGames";
 import SectionCard from "../components/layout/SectionCard";
-import { use } from "react";
-import { fetchFeaturedGames, fetchRAWGGames } from "../utilities";
+import { fetchFeaturedGames } from "../utilities";
 import { Link } from "react-router-dom";
 import { Button } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
-
+import SearchForm from "../components/SearchForm";
+import imgHolder from "../assets/Games-filler.png";
+import logo from "../assets/logo2.jpg";
 
 export default function HomePage() {
     const [featuredGames, setFeaturedGames] = useState([]);
@@ -47,6 +46,7 @@ export default function HomePage() {
                     Sign In or Sign Up to Get Started
                 </Link>
             </Button>
+            <SearchForm />
             <div className="bg-image bg-cover bg-center rounded-sm w-full mt-3 h-130" style={{ backgroundImage: `url(${imgHolder})` }}>
                 <Link to="/new" className="block w-full h-full flex items-center justify-center">
                     <span className="text-center mb-8 text-5xl font-semibold text-purple-300 hover:text-purple-500 bg-black bg-opacity-50">Explore New Releases</span>

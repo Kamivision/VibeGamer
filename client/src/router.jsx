@@ -11,6 +11,7 @@ import GenrePage from "./pages/GenrePage";
 import GameDetail from "./pages/GameDetail";
 import PlatformPage from "./pages/PlatformPage";
 import Recommendations from "./pages/Recommendations";
+import SearchResults from "./pages/SearchResults";
 
 
 const router = createBrowserRouter([
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
             {
                 path: "new",
                 element: <NewRelease />
+            },
+            {
+                path: "search",
+                element: <SearchResults />
             },
             {
                 path: "genre/:genre",
