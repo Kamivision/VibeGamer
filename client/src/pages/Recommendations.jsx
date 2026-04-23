@@ -11,6 +11,7 @@ export default function Recommendations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [strategy, setStrategy] = useState("");
+  const [personality, setPersonality] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -37,6 +38,10 @@ export default function Recommendations() {
           typeof profileResponse?.data?.play_time_preference === "string"
             ? profileResponse.data.play_time_preference
             : "";
+        const profilePersonality =
+          typeof profileResponse?.data?.personality === "string"
+            ? profileResponse.data.personality
+            : "";
 
         const data = await fetchRecommendedGames(personalityTags, playTimePreference, genreTags, platformTags, excludedTags);
 
@@ -44,6 +49,7 @@ export default function Recommendations() {
 
         setGames(Array.isArray(data?.results) ? data.results : []);
         setStrategy(typeof data?.strategy === "string" ? data.strategy : "");
+        setPersonality(profilePersonality);
       } catch {
         if (!isMounted) return;
         setError("We could not load your recommendations right now.");
@@ -66,7 +72,11 @@ export default function Recommendations() {
       title="Your Game Recommendations"
       subtitle="Based on your Vibe Profile, here are some games we think you'll love."
     >
-      <SectionCard title="Recommendation Type:">
+      <SectionCard
+        title={`Recommendation Type: ${personality || "Unknown"}`}
+        cardClassName="bg-cyan-500"
+        bodyClassName="bg-gradient-to-r from-cyan-500 to-cyan-700"
+      >
         {loading ? <p>Loading recommendations...</p> : null}
 
         {!loading && error ? <p className="text-red-600">{error}</p> : null}

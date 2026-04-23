@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status as s
@@ -97,6 +98,36 @@ def merge_unique_games(primary_results, secondary_results):
         merged.append(game)
 
     return merged
+
+
+def to_release_ordinal(released_value):
+    if not isinstance(released_value, str):
+        return 0
+
+    try:
+        return datetime.strptime(released_value, "%Y-%m-%d").date().toordinal()
+    except ValueError:
+        return 0
+
+
+def sort_games_by_recency_then_top_rating(raw_results):
+    """Sort games by newest release first, then by rating_top, then by rating."""
+    scored_results = []
+
+    for index, game in enumerate(raw_results or []):
+        if not isinstance(game, dict):
+            continue
+
+        released_ordinal = to_release_ordinal(game.get("released"))
+        rating_top = game.get("rating_top")
+        rating_top_value = rating_top if isinstance(rating_top, (int, float)) else 0
+        rating = game.get("rating")
+        rating_value = rating if isinstance(rating, (int, float)) else 0
+
+        scored_results.append((released_ordinal, rating_top_value, rating_value, index, game))
+
+    scored_results.sort(key=lambda item: (-item[0], -item[1], -item[2], item[3]))
+    return [item[4] for item in scored_results]
 
 # Helper function to normalize RAWG API results
 def normalize_game_results(raw_results):
@@ -331,7 +362,7 @@ def create_rec_profile(user_profile):
         "hard_filters": { 
             "genre_tags": user_profile.genre_tags or [], 
             "platform_tags": user_profile.platform_tags or [], 
-            "ordering": "-rating" },
+            "ordering": "-released,-rating_top" },
         "soft_preferences": { 
             "tags": user_profile.personality_tags or [],
             "excluded_tags": user_profile.excluded_tags or [],  
@@ -384,12 +415,26 @@ def apply_excluded_tags(raw_results, excluded_tags):
         rating = game.get("rating")
         rating_value = rating if isinstance(rating, (int, float)) else 0
 
-        # Fewer excluded-tag matches rank higher; higher rating breaks ties.
-        scored_results.append((excluded_match_count, -rating_value, index, game))
+        released_ordinal = to_release_ordinal(game.get("released"))
+        rating_top = game.get("rating_top")
+        rating_top_value = rating_top if isinstance(rating_top, (int, float)) else 0
 
-    scored_results.sort(key=lambda item: (item[0], item[1], item[2]))
+        # Fewer excluded-tag matches rank higher. Then prefer newer releases,
+        # then higher rating_top and rating, while preserving original order as final tie-break.
+        scored_results.append(
+            (
+                excluded_match_count,
+                -released_ordinal,
+                -rating_top_value,
+                -rating_value,
+                index,
+                game,
+            )
+        )
 
-    return [item[3] for item in scored_results]
+    scored_results.sort(key=lambda item: (item[0], item[1], item[2], item[3], item[4]))
+
+    return [item[5] for item in scored_results]
 
 class FetchRecommendations(UserView):
     def get(self, request):
@@ -417,7 +462,7 @@ class FetchRecommendations(UserView):
         base_params = {
             "key": api_key,
             "page_size": 12,
-            "ordering": hard_filters.get("ordering", "-rating"),
+            "ordering": hard_filters.get("ordering", "-released,-rating_top"),
         }
 
         raw_genres = hard_filters.get("genre_tags", [])
@@ -455,7 +500,7 @@ class FetchRecommendations(UserView):
         broad_params = {
             "key": api_key,
             "page_size": 24,
-            "ordering": hard_filters.get("ordering", "-rating"),
+            "ordering": hard_filters.get("ordering", "-released,-rating_top"),
         }
 
         rawg_url = "https://api.rawg.io/api/games"
@@ -518,7 +563,8 @@ class FetchRecommendations(UserView):
         debug["chosen_pre_exclusion_count"] = len(results)
 
         excluded_tags = soft_preferences.get("excluded_tags", [])
-        filtered_results = apply_excluded_tags(results, excluded_tags)
+        ranked_results = sort_games_by_recency_then_top_rating(results)
+        filtered_results = apply_excluded_tags(ranked_results, excluded_tags)
         debug["after_exclusion_count"] = len(filtered_results)
 
         # Pass C: broad fallback to refill recommendations after exclusions.
@@ -531,7 +577,8 @@ class FetchRecommendations(UserView):
                     debug["broad_raw_count"] = len(broad_results)
 
                     merged_results = merge_unique_games(results, broad_results)
-                    filtered_results = apply_excluded_tags(merged_results, excluded_tags)
+                    ranked_merged_results = sort_games_by_recency_then_top_rating(merged_results)
+                    filtered_results = apply_excluded_tags(ranked_merged_results, excluded_tags)
 
                     if broad_results:
                         strategy = f"{strategy}+broad-fallback"

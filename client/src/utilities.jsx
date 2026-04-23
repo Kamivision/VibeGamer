@@ -219,7 +219,7 @@ export async function fetchFeaturedGames(page = 1) {
   return response.data;
 }
 
-export async function fetchRAWGGames(searchTerm = "", genre = "", platform = "", page = 1, pageSize = 12, ordering = "-rating_top") {
+export async function fetchRAWGGames(searchTerm = "", genre = "", platform = "", page = 1, pageSize = 12, ordering = "-released,-rating_top") {
   const params = {
     page,
     page_size: pageSize,

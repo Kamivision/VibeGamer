@@ -10,7 +10,7 @@ export default function PageShell({ title, subtitle, children }) {
             {title}
           </Typography>
           {subtitle ? (
-            <Typography variant="paragraph" className="mt-2 text-gray-700">
+            <Typography variant="paragraph" className="mt-2 text-white text-lg">
               {subtitle}
             </Typography>
           ) : null}
