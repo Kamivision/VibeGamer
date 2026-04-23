@@ -40,7 +40,16 @@ export default function PlatformPage() {
 
   return (
     <PageShell title={`${platform ? platform.toUpperCase() : ""} Games`} subtitle={`Browse ${platform || ""} games.`}>
-      <DisplayGames games={games} count={count} />
+      <DisplayGames 
+        games={games} 
+        count={count}
+        isLoading={loading}
+        errorMessage={error}
+        hasNextPage={!!next}
+        hasPreviousPage={!!previous}
+        onNextPage={() => setPage((prev) => prev + 1)}
+        onPreviousPage={() => setPage((prev) => prev - 1)} 
+      />
     </PageShell>
   );
 }

@@ -37,10 +37,6 @@ export default function HomePage() {
         loadFeaturedGames();
     }, [page]);
 
-    const handlePCGamesClick = () => {
-        navigate("/platform/pc");
-    };
-
     return (
         <section className="home-page pt-2 pb-8">
             <div className="bg-image bg-cover bg-center text-white text-center mb-8 rounded-sm w-full mt-3 h-130" style={{ backgroundImage: `url(${logo})` }}>
@@ -56,9 +52,34 @@ export default function HomePage() {
                     <span className="text-center mb-8 text-5xl font-semibold text-purple-300 hover:text-purple-500 bg-black bg-opacity-50">Explore New Releases</span>
                 </Link>
             </div>
-            <Button variant="gradient" color="purple" className="mx-auto mt-8 mb-8 hover:animate-bounce text-xl">
-                <Link to="/platform/pc" className="block w-full h-full text-white text-xl text-center">
+            <Button variant="gradient" color="purple" className={styles.btn1}>
+                <Link to="/platform/pc" className={styles.linkTo}>
                     Browse PC Games
+                </Link>
+            </Button>
+             <Button variant="gradient" color="light-blue" className={styles.btn1}>
+                <Link to="/platform/xbox-series-x" className={styles.linkTo}>
+                    Browse XBOX Games
+                </Link>
+            </Button>
+            <Button variant="gradient" color="purple" className={styles.btn1}>
+                <Link to="/platform/playstation5" className={styles.linkTo}>
+                    Browse Playstation Games
+                </Link>
+            </Button>
+            <Button variant="gradient" color="light-blue" className={styles.btn1}>
+                <Link to="/platform/nintendo-switch" className={styles.linkTo}>
+                    Browse Switch Games
+                </Link>
+            </Button>
+            <Button variant="gradient" color="purple" className={styles.btn1}>
+                <Link to="/platform/android" className={styles.linkTo}>
+                    Browse Android Games
+                </Link>
+            </Button>
+            <Button variant="gradient" color="light-blue" className={styles.btn1}>
+                <Link to="/platform/ios" className={styles.linkTo}>
+                    Browse iOS Games
                 </Link>
             </Button>
             <SectionCard title="Featured Games">
@@ -71,3 +92,8 @@ export default function HomePage() {
     );
 }
 
+const styles = {
+    btn1: "mx-auto mt-8 mb-8 hover:animate-bounce text-xl",
+
+    linkTo: "block w-full h-full text-white text-xl text-center",
+};
