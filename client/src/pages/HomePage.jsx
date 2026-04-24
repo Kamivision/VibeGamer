@@ -90,10 +90,11 @@ export default function HomePage() {
                 </Link>
             </Button>
             <SectionCard title="Featured Games">
-                <DisplayGames 
+                <DisplayGames
+                className="display-games" 
                 games={featuredGames} 
                 isLoading={isLoading} 
-                error={error}
+                errorMessage={error}
                 isGameInLibrary={isGameInLibrary}
                 getLibraryGameIdForGame={getLibraryGameIdForGame}
                 registerLibraryGame={registerLibraryGame}

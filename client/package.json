@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "cy:open": "cypress open",
-    "cy:run": "npx cypress run --spec"
+    "cy:run": "npx cypress run",
+    "cy:run:spec": "sh -c 'npx cypress run --spec cypress/e2e/$1' --"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
