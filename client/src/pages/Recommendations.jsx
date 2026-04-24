@@ -10,7 +10,9 @@ export default function Recommendations() {
     user,
     isGameInLibrary,
     getLibraryGameIdForGame,
+    getLibraryStatusForGame,
     registerLibraryGame,
+    updateLibraryGameStatus,
     unregisterLibraryGame,
   } = useOutletContext();
   const [games, setGames] = useState([]);
@@ -103,7 +105,9 @@ export default function Recommendations() {
                 showWhyButton={true}
                 isGameInLibrary={isGameInLibrary}
                 getLibraryGameIdForGame={getLibraryGameIdForGame}
+                getLibraryStatusForGame={getLibraryStatusForGame}
                 registerLibraryGame={registerLibraryGame}
+                updateLibraryGameStatus={updateLibraryGameStatus}
                 unregisterLibraryGame={unregisterLibraryGame}
               />
             ))}

@@ -12,7 +12,9 @@ export default function DisplayGames({
   onGameRemove,
   isGameInLibrary,
   getLibraryGameIdForGame,
+  getLibraryStatusForGame,
   registerLibraryGame,
+  updateLibraryGameStatus,
   unregisterLibraryGame,
 }) {
   if (isLoading) {
@@ -40,7 +42,9 @@ export default function DisplayGames({
             onRemoveFromLibrary={onGameRemove}
             isGameInLibrary={isGameInLibrary}
             getLibraryGameIdForGame={getLibraryGameIdForGame}
+            getLibraryStatusForGame={getLibraryStatusForGame}
             registerLibraryGame={registerLibraryGame}
+            updateLibraryGameStatus={updateLibraryGameStatus}
             unregisterLibraryGame={unregisterLibraryGame}
           />
         ))}

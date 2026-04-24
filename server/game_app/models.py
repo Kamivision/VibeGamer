@@ -34,6 +34,15 @@ class Game(models.Model):
 
 
 class SavedGame(models.Model):
+    STATUS_SAVED = "saved"
+    STATUS_PLAYING = "playing"
+    STATUS_COMPLETED = "completed"
+    STATUS_CHOICES = [
+        (STATUS_SAVED, "Saved"),
+        (STATUS_PLAYING, "Playing"),
+        (STATUS_COMPLETED, "Completed"),
+    ]
+
     user = models.ForeignKey(
         "user_app.User",
         on_delete=models.CASCADE,
@@ -43,6 +52,11 @@ class SavedGame(models.Model):
         Game,
         on_delete=models.CASCADE,
         related_name="saved_by_users",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_SAVED,
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

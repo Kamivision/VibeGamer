@@ -11,4 +11,4 @@ class SavedGameSerializer(ModelSerializer):
 
     class Meta:
         model = SavedGame
-        fields = ["id", "game", "created_at"]
+        fields = ["id", "game", "status", "created_at"]

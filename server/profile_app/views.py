@@ -23,6 +23,11 @@ class ProfileView(UserView):
         else:
             return Response(serializer.errors, status=s.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request):
+        profile = get_object_or_404(Profile, user=request.user)
+        profile.delete()
+        return Response(status=s.HTTP_204_NO_CONTENT)
+
 
 class ProfileTagOptionsView(UserView):
     def get(self, request):

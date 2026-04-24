@@ -87,6 +87,7 @@ class SavedGameTests(APITestCase):
         self.assertTrue(
             SavedGame.objects.filter(user=self.user, game=self.game).exists()
         )
+        self.assertEqual(response.data["saved_game"]["status"], SavedGame.STATUS_SAVED)  # type: ignore
 
     def test_post_save_returns_200_when_already_saved(self):
         SavedGame.objects.create(user=self.user, game=self.game)
@@ -110,6 +111,18 @@ class SavedGameTests(APITestCase):
         self.assertFalse(
             SavedGame.objects.filter(user=self.user, game=self.game).exists()
         )
+
+    def test_put_save_updates_saved_game_status(self):
+        SavedGame.objects.create(user=self.user, game=self.game)
+
+        self.authenticate()
+        response = self.client.put(self.save_url, {"status": SavedGame.STATUS_PLAYING}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"], SavedGame.STATUS_PLAYING)  # type: ignore
+
+        saved_game = SavedGame.objects.get(user=self.user, game=self.game)
+        self.assertEqual(saved_game.status, SavedGame.STATUS_PLAYING)
 
 
 class GameLibraryFlowTests(APITestCase):

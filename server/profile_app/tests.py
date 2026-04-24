@@ -96,3 +96,11 @@ class ProfileViewTests(APITestCase):
         self.assertIn("platform_tags", response.data)
         self.assertIn("Action", response.data["genre_tags"])
         self.assertIn("PC", response.data["platform_tags"])
+
+    def test_delete_profile_removes_current_users_profile(self):
+        self.authenticate()
+
+        response = self.client.delete(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Profile.objects.filter(user=self.user).exists())

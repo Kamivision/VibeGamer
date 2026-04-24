@@ -7,7 +7,7 @@ import {
   Typography,
   Button,
 } from "@material-tailwind/react";
-import { fetchVibeExplanation, addToLibrary, removeFromLibrary } from "../utilities";
+import { fetchVibeExplanation, addToLibrary, removeFromLibrary, updateSavedGameStatus } from "../utilities";
 import { useNavigate } from "react-router-dom";
 import imageNotFound from "../assets/image-not-found.jpg";
 
@@ -22,15 +22,19 @@ export default function GameCard({
   showWhyButton,
   isGameInLibrary,
   getLibraryGameIdForGame,
+  getLibraryStatusForGame,
   registerLibraryGame,
+  updateLibraryGameStatus,
   unregisterLibraryGame,
 }) {
   const [explanation, setExplanation] = useState("");
   const [loadingExplanation, setLoadingExplanation] = useState(false);
   const [savingLibrary, setSavingLibrary] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [libraryMessage, setLibraryMessage] = useState({ text: "", type: "" });
   const [isSaved, setIsSaved] = useState(Boolean(game?.libraryGameId));
   const [savedLibraryGameId, setSavedLibraryGameId] = useState(game?.libraryGameId || null);
+  const [savedStatus, setSavedStatus] = useState(game?.savedStatus || "saved");
   const navigate = useNavigate();
 
   const isSharedSaved =
@@ -41,6 +45,11 @@ export default function GameCard({
       ? getLibraryGameIdForGame(game)
       : game?.libraryGameId || null;
 
+  const sharedSavedStatus =
+    typeof getLibraryStatusForGame === "function"
+      ? getLibraryStatusForGame(game)
+      : game?.savedStatus || null;
+
   useEffect(() => {
     setIsSaved(Boolean(isSharedSaved));
   }, [isSharedSaved]);
@@ -48,6 +57,15 @@ export default function GameCard({
   useEffect(() => {
     setSavedLibraryGameId(sharedLibraryGameId || null);
   }, [sharedLibraryGameId]);
+
+  useEffect(() => {
+    if (!isSaved) {
+      setSavedStatus("saved");
+      return;
+    }
+
+    setSavedStatus(sharedSavedStatus || game?.savedStatus || "saved");
+  }, [game?.savedStatus, isSaved, sharedSavedStatus]);
 
   async function handleWhyClick() {
     if (explanation) return;
@@ -77,20 +95,23 @@ export default function GameCard({
 
     try {
       const result = await addToLibrary(game);
+      const nextStatus = result?.savedGame?.status || "saved";
       const libraryGameId = result?.game?.id || null;
 
       if (result.alreadySaved) {
         setIsSaved(true);
         setSavedLibraryGameId(libraryGameId);
+        setSavedStatus(nextStatus);
         if (registerLibraryGame) {
-          registerLibraryGame(game, libraryGameId);
+          registerLibraryGame(game, libraryGameId, nextStatus);
         }
         setLibraryMessage({ text: "Game is already in your library.", type: "info" });
       } else {
         setIsSaved(true);
         setSavedLibraryGameId(libraryGameId);
+        setSavedStatus(nextStatus);
         if (registerLibraryGame) {
-          registerLibraryGame(game, libraryGameId);
+          registerLibraryGame(game, libraryGameId, nextStatus);
         }
         setLibraryMessage({ text: "Game added to your library!", type: "success" });
       }
@@ -129,6 +150,7 @@ export default function GameCard({
       await removeFromLibrary(libraryGameId);
       setIsSaved(false);
       setSavedLibraryGameId(null);
+      setSavedStatus("saved");
       if (unregisterLibraryGame) {
         unregisterLibraryGame(game);
       }
@@ -145,6 +167,42 @@ export default function GameCard({
       }
     } finally {
       setSavingLibrary(false);
+    }
+  }
+
+  async function handleStatusChange(event) {
+    const nextStatus = event.target.value;
+    const libraryGameId =
+      savedLibraryGameId ||
+      (typeof getLibraryGameIdForGame === "function" ? getLibraryGameIdForGame(game) : null) ||
+      game?.libraryGameId ||
+      null;
+
+    if (!libraryGameId) {
+      setLibraryMessage({ text: "Save this game before updating its status.", type: "error" });
+      return;
+    }
+
+    setIsUpdatingStatus(true);
+    setLibraryMessage({ text: "", type: "" });
+
+    try {
+      const updatedSavedGame = await updateSavedGameStatus(libraryGameId, nextStatus);
+      setSavedStatus(updatedSavedGame.status || nextStatus);
+
+      if (updateLibraryGameStatus) {
+        updateLibraryGameStatus(game, updatedSavedGame.status || nextStatus);
+      }
+    } catch (error) {
+      const detail =
+        error?.response?.data?.status?.[0] ||
+        error?.response?.data?.detail ||
+        error?.message ||
+        "Failed to update game status.";
+
+      setLibraryMessage({ text: detail, type: "error" });
+    } finally {
+      setIsUpdatingStatus(false);
     }
   }
 
@@ -171,6 +229,24 @@ export default function GameCard({
         <Typography className={cardStyle.desc}>Platforms: {game.platforms?.join(", ") || "Unknown"}</Typography>
         {explanation ? (
           <Typography className="mt-2 text-lg text-black">{explanation}</Typography>
+        ) : null}
+        {isSaved ? (
+          <div className="mt-4 flex flex-col gap-2">
+            <label htmlFor={`saved-status-${game.id}`} className="text-sm font-medium text-gray-700">
+              Library Status
+            </label>
+            <select
+              id={`saved-status-${game.id}`}
+              value={savedStatus}
+              onChange={handleStatusChange}
+              disabled={savingLibrary || isUpdatingStatus}
+              className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="saved">Saved</option>
+              <option value="playing">Playing</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
         ) : null}
       </CardBody>
       <CardFooter className={cardStyle.footer}>

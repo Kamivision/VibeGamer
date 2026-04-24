@@ -198,22 +198,49 @@ class GameList(APIView):
 class SavedGameView(UserView):
     def get(self, request, game_id):
         game = get_object_or_404(Game, pk=game_id)
-        saved = SavedGame.objects.filter(user=request.user, game=game).exists()
-        return Response({"saved": saved})
+        saved_game = SavedGame.objects.filter(user=request.user, game=game).first()
+        if not saved_game:
+            return Response({"saved": False, "status": None})
+
+        return Response(
+            {
+                "saved": True,
+                "status": saved_game.status,
+                "saved_game": SavedGameSerializer(saved_game).data,
+            }
+        )
     
     def post(self, request, game_id):
         game = get_object_or_404(Game, pk=game_id)
         saved_game, created = SavedGame.objects.get_or_create(user=request.user, game=game)
+        serializer = SavedGameSerializer(saved_game)
         if created:
             return Response(
-                {"message": f"{game.title} has been saved for {request.user.username}"},
+                {
+                    "message": f"{game.title} has been saved for {request.user.username}",
+                    "saved_game": serializer.data,
+                },
                 status=s.HTTP_201_CREATED,
             )
 
         return Response(
-            {"message": f"{game.title} is already saved for {request.user.username}"},
+            {
+                "message": f"{game.title} is already saved for {request.user.username}",
+                "saved_game": serializer.data,
+            },
             status=s.HTTP_200_OK,
         )
+
+    def put(self, request, game_id):
+        game = get_object_or_404(Game, pk=game_id)
+        saved_game = get_object_or_404(SavedGame, user=request.user, game=game)
+        serializer = SavedGameSerializer(saved_game, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=s.HTTP_200_OK)
+
+        return Response(serializer.errors, status=s.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, game_id):
         game = get_object_or_404(Game, pk=game_id)

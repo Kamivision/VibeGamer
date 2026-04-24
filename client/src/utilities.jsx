@@ -320,15 +320,29 @@ export async function addToLibrary(rawgGame) {
 
   const saveCheckResponse = await api.get(`games/save/${game.id}/`);
   if (saveCheckResponse.data.saved) {
-    return { alreadySaved: true, game };
+    return {
+      alreadySaved: true,
+      game,
+      savedGame: saveCheckResponse.data.saved_game || null,
+    };
   }
 
   const saveResponse = await api.post(`games/save/${game.id}/`);
-  return { alreadySaved: false, game, result: saveResponse.data };
+  return {
+    alreadySaved: false,
+    game,
+    result: saveResponse.data,
+    savedGame: saveResponse.data.saved_game || null,
+  };
 }
 
 export async function fetchLibrary() {
   const response = await api.get("games/saved/");
+  return response.data;
+}
+
+export async function updateSavedGameStatus(gameId, status) {
+  const response = await api.put(`games/save/${gameId}/`, { status });
   return response.data;
 }
 

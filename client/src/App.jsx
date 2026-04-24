@@ -51,7 +51,10 @@ export default function App() {
 
           if (!externalId) return;
 
-          nextLookup[externalId] = game.id || null;
+          nextLookup[externalId] = {
+            libraryGameId: game.id || null,
+            status: savedItem?.status || "saved",
+          };
         });
 
         setLibraryLookup(nextLookup);
@@ -86,20 +89,58 @@ export default function App() {
       if (!externalId) {
         return game?.libraryGameId || null;
       }
-      return libraryLookup[externalId] || game?.libraryGameId || null;
+      return libraryLookup[externalId]?.libraryGameId || game?.libraryGameId || null;
+    },
+    [libraryLookup, resolveExternalId]
+  );
+
+  const getLibraryStatusForGame = useCallback(
+    (game) => {
+      const externalId = resolveExternalId(game);
+      if (!externalId) {
+        return game?.savedStatus || null;
+      }
+      return libraryLookup[externalId]?.status || game?.savedStatus || null;
     },
     [libraryLookup, resolveExternalId]
   );
 
   const registerLibraryGame = useCallback(
-    (game, libraryGameId) => {
+    (game, libraryGameId, status = "saved") => {
       const externalId = resolveExternalId(game);
       if (!externalId) return;
 
       setLibraryLookup((currentLookup) => ({
         ...currentLookup,
-        [externalId]: libraryGameId || currentLookup[externalId] || game?.libraryGameId || null,
+        [externalId]: {
+          libraryGameId:
+            libraryGameId || currentLookup[externalId]?.libraryGameId || game?.libraryGameId || null,
+          status: status || currentLookup[externalId]?.status || game?.savedStatus || "saved",
+        },
       }));
+    },
+    [resolveExternalId]
+  );
+
+  const updateLibraryGameStatus = useCallback(
+    (game, status) => {
+      const externalId = resolveExternalId(game);
+      if (!externalId) return;
+
+      setLibraryLookup((currentLookup) => {
+        const currentEntry = currentLookup[externalId];
+        if (!currentEntry) {
+          return currentLookup;
+        }
+
+        return {
+          ...currentLookup,
+          [externalId]: {
+            ...currentEntry,
+            status,
+          },
+        };
+      });
     },
     [resolveExternalId]
   );
@@ -132,7 +173,9 @@ export default function App() {
             setUser,
             isGameInLibrary,
             getLibraryGameIdForGame,
+            getLibraryStatusForGame,
             registerLibraryGame,
+            updateLibraryGameStatus,
             unregisterLibraryGame,
           }}
         />

@@ -15,7 +15,9 @@ export default function UserLibrary() {
     user,
     isGameInLibrary,
     getLibraryGameIdForGame,
+    getLibraryStatusForGame,
     registerLibraryGame,
+    updateLibraryGameStatus,
     unregisterLibraryGame,
   } = useOutletContext();
   const navigate = useNavigate();
@@ -31,6 +33,7 @@ export default function UserLibrary() {
       id: Number(game.external_id) || game.id,
       libraryGameId: game.id,
       savedId: savedItem.id,
+      savedStatus: savedItem.status || "saved",
       name: game.title || "Unknown",
       released: game.released_at || "Unknown",
       rating: metadata.rawg_rating || "N/A",
@@ -116,7 +119,9 @@ export default function UserLibrary() {
           onGameRemove={handleRemoveFromLibrary}
           isGameInLibrary={isGameInLibrary}
           getLibraryGameIdForGame={getLibraryGameIdForGame}
+          getLibraryStatusForGame={getLibraryStatusForGame}
           registerLibraryGame={registerLibraryGame}
+          updateLibraryGameStatus={updateLibraryGameStatus}
           unregisterLibraryGame={unregisterLibraryGame}
         />
       </SectionCard>

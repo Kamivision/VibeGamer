@@ -14,7 +14,9 @@ export default function HomePage() {
         const {
             isGameInLibrary,
             getLibraryGameIdForGame,
+            getLibraryStatusForGame,
             registerLibraryGame,
+            updateLibraryGameStatus,
             unregisterLibraryGame,
         } = useOutletContext();
     const [featuredGames, setFeaturedGames] = useState([]);
@@ -97,7 +99,9 @@ export default function HomePage() {
                 errorMessage={error}
                 isGameInLibrary={isGameInLibrary}
                 getLibraryGameIdForGame={getLibraryGameIdForGame}
+                getLibraryStatusForGame={getLibraryStatusForGame}
                 registerLibraryGame={registerLibraryGame}
+                updateLibraryGameStatus={updateLibraryGameStatus}
                 unregisterLibraryGame={unregisterLibraryGame}
                 />
             </SectionCard>

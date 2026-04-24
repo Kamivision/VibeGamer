@@ -8,7 +8,9 @@ export default function NewRelease() {
   const {
     isGameInLibrary,
     getLibraryGameIdForGame,
+    getLibraryStatusForGame,
     registerLibraryGame,
+    updateLibraryGameStatus,
     unregisterLibraryGame,
   } = useOutletContext();
   const [games, setGames] = useState([]);
@@ -56,7 +58,9 @@ export default function NewRelease() {
         onPreviousPage={() => setPage((prev) => prev - 1)}
         isGameInLibrary={isGameInLibrary}
         getLibraryGameIdForGame={getLibraryGameIdForGame}
+        getLibraryStatusForGame={getLibraryStatusForGame}
         registerLibraryGame={registerLibraryGame}
+        updateLibraryGameStatus={updateLibraryGameStatus}
         unregisterLibraryGame={unregisterLibraryGame}
       />
     </PageShell>
