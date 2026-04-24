@@ -125,6 +125,12 @@ export async function updateProfile({ personality, personalityTags, quizResults,
   });
   return response.data;
 }
+
+export async function deleteProfile() {
+  const response = await api.delete("profile/");
+  return response.data;
+}
+
 // Utility function to build query parameters for recommendations based on profile data that will work with RAWG and my backend.
 export function recommendedParams(personalityTags = [], playTimePreference = "", genreTags = [], platformTags = [], excludedTags = []) {
   const params = {};

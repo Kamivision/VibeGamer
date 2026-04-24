@@ -3,7 +3,7 @@ import { Navigate, useNavigate, useOutletContext } from "react-router-dom";
 import { Card, CardBody, Typography } from "@material-tailwind/react";
 import { UserCircleIcon as DefaultAvatar } from "@heroicons/react/24/outline";
 import logoImage from "../assets/logo.jpg";
-import { updateProfile, api } from "../utilities";
+import { updateProfile, deleteProfile, handleSignOut, api } from "../utilities";
 import BannerCard from "../components/layout/BannerCard";
 import PageShell from "../components/layout/PageShell";
 import SectionCard from "../components/layout/SectionCard";
@@ -38,7 +38,7 @@ function parseTags(raw) {
 }
 
 export default function UserProfile() {
-  const { user } = useOutletContext();
+  const { user, setUser } = useOutletContext();
   const navigate = useNavigate();
 
   // "loading" | "viewing" | "editing" | "saving" | "error"
@@ -64,6 +64,7 @@ export default function UserProfile() {
   const [tagText, setTagText] = useState("");
   const [excludedTagText, setExcludedTagText] = useState("");
   const [tagOptions, setTagOptions] = useState({ genre_tags: [], platform_tags: [] });
+  const [isDeletingProfile, setIsDeletingProfile] = useState(false);
 
   // Fetch profile on mount
   useEffect(() => {
@@ -170,6 +171,29 @@ export default function UserProfile() {
       setError(err.response?.data?.error || "Failed to save profile");
       // Stay in editing so the user can fix the problem
       setState("editing");
+    }
+  }
+
+  async function handleDeleteProfile() {
+    const shouldDelete = window.confirm(
+      "Are you sure you want to delete your profile? This action cannot be undone."
+    );
+
+    if (!shouldDelete) {
+      return;
+    }
+
+    setIsDeletingProfile(true);
+    setError(null);
+
+    try {
+      await deleteProfile();
+      await handleSignOut();
+      setUser(null);
+      navigate("/auth", { replace: true });
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to delete your profile");
+      setIsDeletingProfile(false);
     }
   }
 
@@ -288,6 +312,17 @@ export default function UserProfile() {
               >
                 View Recommendations
               </button>
+
+              {!isEditing ? (
+                <button
+                  type="button"
+                  className={sharedStyles.dangerBtn}
+                  onClick={handleDeleteProfile}
+                  disabled={isDeletingProfile}
+                >
+                  {isDeletingProfile ? "Deleting Profile..." : "Delete Profile"}
+                </button>
+              ) : null}
             </div>
           </div>
 
@@ -448,9 +483,9 @@ export default function UserProfile() {
       </SectionCard>
 
       {/* ── Recent Games card: placeholder until game history is built ──────── */}
-      <SectionCard title="Recent Games">
+      {/* <SectionCard title="Recent Games">
         <p>Placeholder for recent games.</p>
-      </SectionCard>
+      </SectionCard> */}
     </PageShell>
   );
 }
