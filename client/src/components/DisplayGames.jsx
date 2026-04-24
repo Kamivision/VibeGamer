@@ -10,6 +10,10 @@ export default function DisplayGames({
   onNextPage,
   onPreviousPage,
   onGameRemove,
+  isGameInLibrary,
+  getLibraryGameIdForGame,
+  registerLibraryGame,
+  unregisterLibraryGame,
 }) {
   if (isLoading) {
     return <p className="text-lg">Loading games...</p>;
@@ -30,7 +34,15 @@ export default function DisplayGames({
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {games.map((game) => (
-          <GameCard key={game.id} game={game} onRemoveFromLibrary={onGameRemove} />
+          <GameCard
+            key={game.id}
+            game={game}
+            onRemoveFromLibrary={onGameRemove}
+            isGameInLibrary={isGameInLibrary}
+            getLibraryGameIdForGame={getLibraryGameIdForGame}
+            registerLibraryGame={registerLibraryGame}
+            unregisterLibraryGame={unregisterLibraryGame}
+          />
         ))}
       </div>
 

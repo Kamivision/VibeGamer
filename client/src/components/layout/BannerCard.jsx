@@ -10,9 +10,9 @@ export default function BannerCard({
 }) {
   return (
     <Card shadow={false} className={className}>
-      <Typography className="pt-4 text-center text-4xl font-bold text-yellow-300 text-shadow-lg">
+      <h1 className="pt-4 text-center text-5xl font-bold text-white text-shadow-lg">
         {title}
-      </Typography>
+      </h1>
 
       <CardHeader shadow={false} className="mt-5 h-70 rounded-lg">
         <img

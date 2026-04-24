@@ -11,7 +11,13 @@ import SearchForm from "../components/SearchForm";
 import { sharedStyles } from "../styles/sharedStyles";
 
 export default function UserLibrary() {
-  const { user } = useOutletContext();
+  const {
+    user,
+    isGameInLibrary,
+    getLibraryGameIdForGame,
+    registerLibraryGame,
+    unregisterLibraryGame,
+  } = useOutletContext();
   const navigate = useNavigate();
   const [library, setLibrary] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -108,6 +114,10 @@ export default function UserLibrary() {
           isLoading={isLoading}
           errorMessage={errorMessage}
           onGameRemove={handleRemoveFromLibrary}
+          isGameInLibrary={isGameInLibrary}
+          getLibraryGameIdForGame={getLibraryGameIdForGame}
+          registerLibraryGame={registerLibraryGame}
+          unregisterLibraryGame={unregisterLibraryGame}
         />
       </SectionCard>
 

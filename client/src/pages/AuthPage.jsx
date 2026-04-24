@@ -53,8 +53,8 @@ export default function AuthPage() {
       
 
   return (
-    <div className="mx-auto max-w-md py-8">
-      <AuthForm 
+    <div className="mx-auto max-w-md py-8 min-h-screen flex flex-col justify-center">
+      <AuthForm
       mode={isSignUp ? "signup" : "signin"} 
       onAuthSuccess={handleAuthSuccess} 
       />

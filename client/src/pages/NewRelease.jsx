@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 import DisplayGames from "../components/DisplayGames";
 import PageShell from "../components/layout/PageShell";
 import { fetchNewReleases } from "../utilities";
 
 export default function NewRelease() {
+  const {
+    isGameInLibrary,
+    getLibraryGameIdForGame,
+    registerLibraryGame,
+    unregisterLibraryGame,
+  } = useOutletContext();
   const [games, setGames] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,6 +54,10 @@ export default function NewRelease() {
         hasPreviousPage={!!previous}
         onNextPage={() => setPage((prev) => prev + 1)}
         onPreviousPage={() => setPage((prev) => prev - 1)}
+        isGameInLibrary={isGameInLibrary}
+        getLibraryGameIdForGame={getLibraryGameIdForGame}
+        registerLibraryGame={registerLibraryGame}
+        unregisterLibraryGame={unregisterLibraryGame}
       />
     </PageShell>
   );

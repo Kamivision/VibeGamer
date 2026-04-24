@@ -3,14 +3,10 @@ import { useNavigate } from "react-router-dom";
 export default function DisplayQuizResults({ result, restart, saveStatus, saveError }) {
     const navigate = useNavigate();
 
-    const handleRecClick = () => {
-        navigate("/recommended");
-    };
-
     return (
         <div className={styles.wrap}>
             <div className={styles.result}>
-                <div className={styles.vibeBadge}>your vibe is</div>
+                <div className={styles.vibeBadge}>Your Vibe is...</div>
                 <h1 className={styles.vibeName}>{result.name}</h1>
                 <p className={styles.vibeDesc}>{result.desc}</p>
                 <div className={styles.traitRow}>
@@ -32,15 +28,21 @@ export default function DisplayQuizResults({ result, restart, saveStatus, saveEr
                 <div className={styles.resultActions}>
                     <button 
                     type="button" 
-                    className={`${styles.btn} ${styles.btnGhost}`} 
+                    className={`${styles.btn} ${styles.btnPrimary}`} 
                     onClick={restart}>
                         Retake quiz
                     </button>
                     <button
-                    onClick={handleRecClick}
+                    onClick={() => navigate("/recommended")}
                     type="button" 
                     className={`${styles.btn} ${styles.btnPrimary}`}>
                         Find my games
+                    </button>
+                    <button
+                    onClick={() => navigate("/profile")}
+                    type="button" 
+                    className={`${styles.btn} ${styles.btnPrimary}`}>
+                        Go to My Profile
                     </button>
                 </div>
             </div>
@@ -49,19 +51,19 @@ export default function DisplayQuizResults({ result, restart, saveStatus, saveEr
 }
 
 const styles = {
-        wrap: "mx-auto max-w-[520px] py-6 font-sans",
+        wrap: "mx-auto w-full mt-4 py-6 font-sans bg-blue-700 rounded-lg",
 
         result: "py-4 text-center",
 
-        vibeBadge: "mb-4 inline-block rounded-full bg-[#EEEDFE] px-[18px] py-[6px] text-[13px] font-medium text-[#26215C]",
+        vibeBadge: "mb-4 inline-block rounded-full bg-[#EEEDFE] px-[18px] py-[6px] text-xl font-medium text-[#26215C]",
 
-        vibeName: "mb-2 text-[2rem] font-medium text-[#1a1a18]",
+        vibeName: "mb-2 text-5xl font-bold text-cyan-500",
 
-        vibeDesc: "mx-auto mb-6 max-w-[400px] text-sm leading-6 text-[#5a5a55]",
+        vibeDesc: "mx-auto mb-6 max-w-xl text-lg leading-6 text-white",
 
         traitRow: "mb-6 flex flex-wrap justify-center gap-2",
 
-        trait: "rounded-full border border-black/10 px-[10px] py-1 text-xs text-[#5a5a55]",
+        trait: "rounded-full border border-black/50 px-[10px] py-1 text-lg text-cyan-300",
 
         statusMessage: "mb-4 text-sm text-zinc-500",
 
@@ -75,5 +77,5 @@ const styles = {
 
         btnGhost: "border-black/15 bg-transparent text-[#1a1a18] hover:bg-zinc-50",
 
-        btnPrimary: "border-[#7F77DD] bg-[#7F77DD] text-white hover:bg-[#6f67cf]",
+        btnPrimary: "border-[#7F77DD] bg-violet-600 text-white hover:bg-violet-400",
 };

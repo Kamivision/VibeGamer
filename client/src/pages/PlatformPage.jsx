@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { fetchRAWGGames } from "../utilities";
 import PageShell from "../components/layout/PageShell";
 import DisplayGames from "../components/DisplayGames";
 
 
 export default function PlatformPage() {
+  const {
+    isGameInLibrary,
+    getLibraryGameIdForGame,
+    registerLibraryGame,
+    unregisterLibraryGame,
+  } = useOutletContext();
   // Get the platform from the URL (e.g., 'pc', 'xbox', etc.)
   const { platform } = useParams();
   const [games, setGames] = useState([]);
@@ -48,7 +54,11 @@ export default function PlatformPage() {
         hasNextPage={!!next}
         hasPreviousPage={!!previous}
         onNextPage={() => setPage((prev) => prev + 1)}
-        onPreviousPage={() => setPage((prev) => prev - 1)} 
+        onPreviousPage={() => setPage((prev) => prev - 1)}
+        isGameInLibrary={isGameInLibrary}
+        getLibraryGameIdForGame={getLibraryGameIdForGame}
+        registerLibraryGame={registerLibraryGame}
+        unregisterLibraryGame={unregisterLibraryGame}
       />
     </PageShell>
   );

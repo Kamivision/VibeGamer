@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -14,13 +14,39 @@ import { useNavigate } from "react-router-dom";
 // showWhyButton is a new prop (true/false). When it is true, the "Why this game?" button
 // will be displayed on the card. When it is false or not provided, the button is hidden.
 // This lets us reuse GameCard everywhere but only show that button on the Recommendations page.
-export default function GameCard({ game, user, onRemoveFromLibrary, showWhyButton }) {
+export default function GameCard({
+  game,
+  user,
+  onRemoveFromLibrary,
+  showWhyButton,
+  isGameInLibrary,
+  getLibraryGameIdForGame,
+  registerLibraryGame,
+  unregisterLibraryGame,
+}) {
   const [explanation, setExplanation] = useState("");
   const [loadingExplanation, setLoadingExplanation] = useState(false);
   const [savingLibrary, setSavingLibrary] = useState(false);
   const [libraryMessage, setLibraryMessage] = useState({ text: "", type: "" });
   const [isSaved, setIsSaved] = useState(Boolean(game?.libraryGameId));
+  const [savedLibraryGameId, setSavedLibraryGameId] = useState(game?.libraryGameId || null);
   const navigate = useNavigate();
+
+  const isSharedSaved =
+    typeof isGameInLibrary === "function" ? isGameInLibrary(game) : Boolean(game?.libraryGameId);
+
+  const sharedLibraryGameId =
+    typeof getLibraryGameIdForGame === "function"
+      ? getLibraryGameIdForGame(game)
+      : game?.libraryGameId || null;
+
+  useEffect(() => {
+    setIsSaved(Boolean(isSharedSaved));
+  }, [isSharedSaved]);
+
+  useEffect(() => {
+    setSavedLibraryGameId(sharedLibraryGameId || null);
+  }, [sharedLibraryGameId]);
 
   async function handleWhyClick() {
     if (explanation) return;
@@ -50,11 +76,21 @@ export default function GameCard({ game, user, onRemoveFromLibrary, showWhyButto
 
     try {
       const result = await addToLibrary(game);
+      const libraryGameId = result?.game?.id || null;
+
       if (result.alreadySaved) {
         setIsSaved(true);
+        setSavedLibraryGameId(libraryGameId);
+        if (registerLibraryGame) {
+          registerLibraryGame(game, libraryGameId);
+        }
         setLibraryMessage({ text: "Game is already in your library.", type: "info" });
       } else {
         setIsSaved(true);
+        setSavedLibraryGameId(libraryGameId);
+        if (registerLibraryGame) {
+          registerLibraryGame(game, libraryGameId);
+        }
         setLibraryMessage({ text: "Game added to your library!", type: "success" });
       }
     } catch (error) {
@@ -74,7 +110,16 @@ export default function GameCard({ game, user, onRemoveFromLibrary, showWhyButto
   }
 
   async function handleRemoveLibraryClick() {
-    const libraryGameId = game?.libraryGameId || game?.id;
+    const libraryGameId =
+      savedLibraryGameId ||
+      (typeof getLibraryGameIdForGame === "function" ? getLibraryGameIdForGame(game) : null) ||
+      game?.libraryGameId ||
+      null;
+
+    if (!libraryGameId) {
+      setLibraryMessage({ text: "Could not find this saved game in your library.", type: "error" });
+      return;
+    }
 
     setSavingLibrary(true);
     setLibraryMessage({ text: "", type: "" });
@@ -82,6 +127,10 @@ export default function GameCard({ game, user, onRemoveFromLibrary, showWhyButto
     try {
       await removeFromLibrary(libraryGameId);
       setIsSaved(false);
+      setSavedLibraryGameId(null);
+      if (unregisterLibraryGame) {
+        unregisterLibraryGame(game);
+      }
       setLibraryMessage({ text: "Game removed from your library.", type: "success" });
 
       if (onRemoveFromLibrary) {

@@ -48,6 +48,146 @@ describe("Recommendations page", () => {
     cy.clearLocalStorage();
   });
 
+  it("persists add/remove library state after navigating to another page", () => {
+    const testRecommendation = buildGame(
+      303,
+      "Cloud Harbor",
+      ["Adventure", "Indie"],
+      ["PC", "Switch"]
+    );
+    let savedInLibrary = false;
+
+    // Keep auth and profile deterministic for this flow test.
+    cy.intercept("GET", "**/api/v1/users/", {
+      statusCode: 200,
+      body: authenticatedUser,
+    }).as("verifyUser");
+
+    cy.intercept("GET", "**/api/v1/profile/", {
+      statusCode: 200,
+      body: cozyProfile,
+    }).as("getProfile");
+
+    cy.intercept({ method: "GET", pathname: "/api/v1/games/recommended/" }, {
+      statusCode: 200,
+      body: {
+        strategy: "profile-driven",
+        results: [testRecommendation],
+      },
+    }).as("getRecommendations");
+
+    // App-level shared library lookup should reflect save mutations across page loads.
+    cy.intercept("GET", "**/api/v1/games/saved/", () => {
+      if (!savedInLibrary) {
+        return {
+          statusCode: 200,
+          body: [],
+        };
+      }
+
+      return {
+        statusCode: 200,
+        body: [
+          {
+            id: 1,
+            game: {
+              id: 9001,
+              external_id: String(testRecommendation.id),
+              title: testRecommendation.name,
+              released_at: testRecommendation.released,
+              image_url: testRecommendation.background_image,
+              tags: testRecommendation.genres,
+              metadata: {
+                rawg_rating: testRecommendation.rating,
+                platforms: testRecommendation.platforms,
+              },
+            },
+          },
+        ],
+      };
+    }).as("getSavedGames");
+
+    // Save flow used by addToLibrary: create game record, verify not saved, then save.
+    cy.intercept("POST", "**/api/v1/games/", (req) => {
+      expect(req.body.external_id).to.eq(String(testRecommendation.id));
+      req.reply({
+        statusCode: 201,
+        body: {
+          id: 9001,
+          external_id: String(testRecommendation.id),
+        },
+      });
+    }).as("createGame");
+
+    cy.intercept("GET", "**/api/v1/games/save/9001/", {
+      statusCode: 200,
+      body: { saved: false },
+    }).as("checkSaved");
+
+    cy.intercept("POST", "**/api/v1/games/save/9001/", (req) => {
+      savedInLibrary = true;
+      req.reply({
+        statusCode: 201,
+        body: { saved: true },
+      });
+    }).as("saveGame");
+
+    // New releases page should include the same game id so the shared lookup can mark it saved.
+    cy.intercept({ method: "GET", pathname: "/api/v1/games/rawg/" }, {
+      statusCode: 200,
+      body: {
+        count: 1,
+        next: null,
+        previous: null,
+        results: [testRecommendation],
+      },
+    }).as("getRawgGames");
+
+    cy.visit("/recommended", {
+      onBeforeLoad(win) {
+        win.localStorage.setItem("token", "test-token");
+      },
+    });
+
+    cy.wait("@verifyUser");
+    cy.wait("@getSavedGames");
+    cy.wait("@getProfile");
+    cy.wait("@getRecommendations");
+
+    cy.contains("Cloud Harbor")
+      .closest(".overflow-hidden")
+      .within(() => {
+        cy.contains("button", "Add to Library").click();
+      });
+
+    cy.wait("@createGame");
+    cy.wait("@checkSaved");
+    cy.wait("@saveGame");
+
+    cy.contains("Cloud Harbor")
+      .closest(".overflow-hidden")
+      .within(() => {
+        cy.contains("button", "Remove from Library").should("be.visible");
+      });
+
+    cy.visit("/new", {
+      onBeforeLoad(win) {
+        win.localStorage.setItem("token", "test-token");
+      },
+    });
+
+    cy.wait("@verifyUser");
+    cy.wait("@getSavedGames");
+    cy.wait("@getRawgGames");
+
+    cy.contains("Cloud Harbor")
+      .closest(".overflow-hidden")
+      .within(() => {
+        cy.contains("button", "Remove from Library").should("be.visible");
+        cy.contains("button", "Add to Library").should("not.exist");
+      });
+  });
+
   it("shows different recommendations when profile inputs change", () => {
     const profileSequence = [cozyProfile, competitiveProfile];
     let profileCallCount = 0;

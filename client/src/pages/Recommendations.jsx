@@ -6,7 +6,13 @@ import GameCard from "../components/GameCard";
 import { api, fetchRecommendedGames } from "../utilities";
 
 export default function Recommendations() {
-  const { user } = useOutletContext();
+  const {
+    user,
+    isGameInLibrary,
+    getLibraryGameIdForGame,
+    registerLibraryGame,
+    unregisterLibraryGame,
+  } = useOutletContext();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -90,7 +96,16 @@ export default function Recommendations() {
             {games.map((game) => (
               // showWhyButton={true} tells GameCard to display the "Why this game?" button.
               // We only pass this here on the Recommendations page, so it won't appear anywhere else.
-              <GameCard key={game.id || game.name} game={game} user={user} showWhyButton={true} />
+              <GameCard
+                key={game.id || game.name}
+                game={game}
+                user={user}
+                showWhyButton={true}
+                isGameInLibrary={isGameInLibrary}
+                getLibraryGameIdForGame={getLibraryGameIdForGame}
+                registerLibraryGame={registerLibraryGame}
+                unregisterLibraryGame={unregisterLibraryGame}
+              />
             ))}
           </div>
         ) : null}

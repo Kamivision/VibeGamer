@@ -5,11 +5,18 @@ import { fetchFeaturedGames } from "../utilities";
 import { Link } from "react-router-dom";
 import { Button } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import SearchForm from "../components/SearchForm";
 import imgHolder from "../assets/Games-filler.png";
 import logo from "../assets/logo2.jpg";
 
 export default function HomePage() {
+        const {
+            isGameInLibrary,
+            getLibraryGameIdForGame,
+            registerLibraryGame,
+            unregisterLibraryGame,
+        } = useOutletContext();
     const [featuredGames, setFeaturedGames] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -86,7 +93,12 @@ export default function HomePage() {
                 <DisplayGames 
                 games={featuredGames} 
                 isLoading={isLoading} 
-                error={error} />
+                error={error}
+                isGameInLibrary={isGameInLibrary}
+                getLibraryGameIdForGame={getLibraryGameIdForGame}
+                registerLibraryGame={registerLibraryGame}
+                unregisterLibraryGame={unregisterLibraryGame}
+                />
             </SectionCard>
         </section>
     );

@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { fetchRAWGGames } from "../utilities";
 import PageShell from "../components/layout/PageShell";
 import DisplayGames from "../components/DisplayGames";
 
 
 export default function GenrePage() {
+  const {
+    isGameInLibrary,
+    getLibraryGameIdForGame,
+    registerLibraryGame,
+    unregisterLibraryGame,
+  } = useOutletContext();
   const { genre } = useParams();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +53,11 @@ export default function GenrePage() {
         hasNextPage={!!next}
         hasPreviousPage={!!previous}
         onNextPage={() => setPage((prev) => prev + 1)}
-        onPreviousPage={() => setPage((prev) => prev - 1)} 
+        onPreviousPage={() => setPage((prev) => prev - 1)}
+        isGameInLibrary={isGameInLibrary}
+        getLibraryGameIdForGame={getLibraryGameIdForGame}
+        registerLibraryGame={registerLibraryGame}
+        unregisterLibraryGame={unregisterLibraryGame}
       />
     </PageShell>
   );

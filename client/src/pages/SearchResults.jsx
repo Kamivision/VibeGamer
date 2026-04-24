@@ -1,10 +1,16 @@
 import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useOutletContext, useSearchParams } from "react-router-dom";
 import DisplayGames from "../components/DisplayGames";
 import SearchForm from "../components/SearchForm";
 import useSearch from "../hooks/useSearch";
 
 export default function SearchResults() {
+    const {
+        isGameInLibrary,
+        getLibraryGameIdForGame,
+        registerLibraryGame,
+        unregisterLibraryGame,
+    } = useOutletContext();
     const [searchParams] = useSearchParams();
     const { results, search, searchLoading, searchError, searchCount } = useSearch();
     
@@ -32,6 +38,10 @@ export default function SearchResults() {
                     count={searchCount}
                     isLoading={searchLoading}
                     errorMessage={searchError?.message}
+                    isGameInLibrary={isGameInLibrary}
+                    getLibraryGameIdForGame={getLibraryGameIdForGame}
+                    registerLibraryGame={registerLibraryGame}
+                    unregisterLibraryGame={unregisterLibraryGame}
                 />
             </div>
         </div>
