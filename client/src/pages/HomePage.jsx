@@ -45,18 +45,18 @@ export default function HomePage() {
 
     return (
         <section className="home-page pt-2 pb-8">
-            <div className="bg-image bg-cover bg-center text-white text-center mb-8 rounded-sm w-full mt-3 h-130" style={{ backgroundImage: `url(${logo})` }}>
+            <div className="hero-image bg-image bg-cover bg-center text-white text-center mb-8 rounded-sm w-full mt-3 h-130" style={{ backgroundImage: `url(${logo})` }}>
             </div>
-            <h1 className="text-4xl font-bold pb-4 text-white text-center">Discover Your Next Favorite Game!</h1>
-            <Button variant="gradient" color="purple" className="mx-auto mb-8 hover:animate-bounce">
+            <h1 className="subheading text-4xl font-bold pb-4 text-white text-center">Discover Your Next Favorite Game!</h1>
+            <Button variant="gradient" color="purple" className=" cta mx-auto mb-8 hover:animate-bounce">
                 <Link to="/auth" className="block w-full h-full">
                     Sign In or Sign Up to Get Started
                 </Link>
             </Button>
-            <SearchForm />
+            <SearchForm className="search-form" />
             <div className="bg-image bg-cover bg-center rounded-sm w-full mt-3 h-130" style={{ backgroundImage: `url(${imgHolder})` }}>
                 <Link to="/new" className="block w-full h-full flex items-center justify-center">
-                    <span className="text-center mb-8 text-5xl font-semibold text-purple-300 hover:text-purple-500 bg-black bg-opacity-50">Explore New Releases</span>
+                    <span className="explore text-center mb-8 text-5xl font-semibold text-purple-300 hover:text-purple-500 bg-black bg-opacity-50">Explore New Releases</span>
                 </Link>
             </div>
             <Button variant="gradient" color="purple" className={styles.btn1}>

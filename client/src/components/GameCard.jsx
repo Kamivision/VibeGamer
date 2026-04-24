@@ -9,6 +9,7 @@ import {
 } from "@material-tailwind/react";
 import { fetchVibeExplanation, addToLibrary, removeFromLibrary } from "../utilities";
 import { useNavigate } from "react-router-dom";
+import imageNotFound from "../assets/image-not-found.jpg";
 
 
 // showWhyButton is a new prop (true/false). When it is true, the "Why this game?" button
@@ -147,13 +148,19 @@ export default function GameCard({
     }
   }
 
+  const gameBackgroundImage = game?.background_image || imageNotFound;
+
   return (
     <Card className="overflow-hidden">
       <CardHeader floated={false} shadow={false} className="m-0 rounded-none">
         <img
-          src={game.background_image}
+          src={gameBackgroundImage}
           alt={game.name}
           className="w-full h-48 object-cover"
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = imageNotFound;
+          }}
         />
       </CardHeader>
       <CardBody>
@@ -163,7 +170,7 @@ export default function GameCard({
         <Typography className={cardStyle.desc}>Genres: {game.genres?.join(", ") || "Unknown"}</Typography>
         <Typography className={cardStyle.desc}>Platforms: {game.platforms?.join(", ") || "Unknown"}</Typography>
         {explanation ? (
-          <Typography className="mt-2 text-sm italic text-purple-700">{explanation}</Typography>
+          <Typography className="mt-2 text-lg text-black">{explanation}</Typography>
         ) : null}
       </CardBody>
       <CardFooter className={cardStyle.footer}>
@@ -177,7 +184,7 @@ export default function GameCard({
             onClick={handleWhyClick}
             disabled={loadingExplanation || !!explanation}
           >
-            {loadingExplanation ? "..." : "Why this game?"}
+            {loadingExplanation ? "Loading..." : "Why this game?"}
           </Button>
         ) : null}
         <Button

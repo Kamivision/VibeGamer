@@ -1,5 +1,6 @@
 import { Card, CardHeader, CardBody } from "@material-tailwind/react";
 import SectionCard from "./layout/SectionCard";
+import imageNotFound from "../assets/image-not-found.jpg";
 
 function getNameList(items, nestedKey = null) {
   if (!Array.isArray(items)) {
@@ -40,11 +41,20 @@ export default function DisplayDetail({ game }) {
   const genres = getNameList(game.genres);
   const platforms = getNameList(game.platforms, "platform");
   const stores = getNameList(game.stores, "store");
+  const gameBackgroundImage = game?.background_image || imageNotFound;
 
   return (
     <Card className="overflow-hidden">
         <CardHeader floated={false} shadow={false} className="m-0 rounded-none">
-            <img src={game.background_image} alt={game.name} className="w-full" />
+            <img
+              src={gameBackgroundImage}
+              alt={game.name}
+              className="w-full"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = imageNotFound;
+              }}
+            />
         </CardHeader>
         <CardBody>
             <h1>{game.name}</h1>

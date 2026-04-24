@@ -18,7 +18,7 @@ def build_explain_prompt(game_name, genres, personality, personality_tags):
         f"You are a friendly game recommendation assistant. "
         f"A user with the gaming personality '{personality}' and interests in {tag_text} "
         f"has been recommended the game '{game_name}' (genres: {genre_text}). "
-        f"In 2-3 sentences, explain why this game is a great match for them. "
+        f"In one sentence, explain why this game is a great match for them. "
         f"Be enthusiastic but concise. Do not use bullet points."
     )
     return prompt

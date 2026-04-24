@@ -1,4 +1,4 @@
-import imgHolder from "../assets/Games-filler.png";
+import imageNotFound from "../assets/image-not-found.jpg";
 import logoName from "../assets/logo-name.jpg";
 import BannerCard from "../components/layout/BannerCard";
 import PageShell from "../components/layout/PageShell";
@@ -34,7 +34,7 @@ export default function UserLibrary() {
       name: game.title || "Unknown",
       released: game.released_at || "Unknown",
       rating: metadata.rawg_rating || "N/A",
-      background_image: game.image_url || imgHolder,
+      background_image: game.image_url || imageNotFound,
       genres: Array.isArray(game.tags) ? game.tags : [],
       platforms: Array.isArray(metadata.platforms) ? metadata.platforms : [],
       slug: game.slug || "",
